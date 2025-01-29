@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Data.Entities;
 
-[Table("statusType")]
+[Table("StatusTypes")]
 public class StatusTypesEntity
 {
     [Key]

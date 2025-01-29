@@ -3,10 +3,9 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Data.Entities;
 
-[Table("contactPerson")]
+[Table("ContactPersons")]
 public class ContactPersonEntity
 {
-
     [Key]
     [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
     public int Id { get; set; }

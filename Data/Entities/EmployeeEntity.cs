@@ -4,7 +4,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Data.Entities;
 
-[Table("employee")]
+[Table("Employees")]
 [Index(nameof(Email), IsUnique = true)]
 public class EmployeeEntity
 {

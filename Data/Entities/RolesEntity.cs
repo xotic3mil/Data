@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Data.Entities;
 
-[Table("roles")]
+[Table("Roles")]
 public class RolesEntity
 {
     [Key]
@@ -13,7 +13,7 @@ public class RolesEntity
     public string RoleName { get; set; } = null!;
 
 
-    // Navigation (optional): List of employees with this role
+    // Navigation (optional): List of employees with roles
     public ICollection<EmployeeEntity>? Employees { get; set; }
 
 

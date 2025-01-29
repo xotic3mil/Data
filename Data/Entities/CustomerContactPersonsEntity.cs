@@ -1,10 +1,9 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-
 namespace Data.Entities;
 
-[Table("customercontacts")]
+[Table("CustomerContacts")]
 public class CustomerContactPersonsEntity
 {
     [Key]
@@ -15,5 +14,5 @@ public class CustomerContactPersonsEntity
     public CustomerEntity? Customer { get; set; }
 
     [ForeignKey(nameof(ContactPersonId))]
-    public ContactPersonEntity? ContactPerson { get; set; }
+    public ContactPersonEntity? ContactPersons { get; set; }
 }

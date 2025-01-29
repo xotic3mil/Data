@@ -13,7 +13,7 @@ namespace Data.Migrations
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
-                name: "contactPerson",
+                name: "ContactPersons",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "integer", nullable: false)
@@ -26,11 +26,11 @@ namespace Data.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_contactPerson", x => x.Id);
+                    table.PrimaryKey("PK_ContactPersons", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
-                name: "currencies",
+                name: "Currencies",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "integer", nullable: false)
@@ -39,24 +39,24 @@ namespace Data.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_currencies", x => x.Id);
+                    table.PrimaryKey("PK_Currencies", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
-                name: "roles",
+                name: "Roles",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    RoleName = table.Column<string>(type: "text", nullable: true)
+                    RoleName = table.Column<string>(type: "text", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_roles", x => x.Id);
+                    table.PrimaryKey("PK_Roles", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
-                name: "statusType",
+                name: "StatusTypes",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "integer", nullable: false)
@@ -65,11 +65,11 @@ namespace Data.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_statusType", x => x.Id);
+                    table.PrimaryKey("PK_StatusTypes", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
-                name: "units",
+                name: "Units",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "integer", nullable: false)
@@ -78,11 +78,11 @@ namespace Data.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_units", x => x.Id);
+                    table.PrimaryKey("PK_Units", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
-                name: "customer",
+                name: "Customers",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "integer", nullable: false)
@@ -92,16 +92,16 @@ namespace Data.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_customer", x => x.Id);
+                    table.PrimaryKey("PK_Customers", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_customer_contactPerson_ContactPersonId",
+                        name: "FK_Customers_ContactPersons_ContactPersonId",
                         column: x => x.ContactPersonId,
-                        principalTable: "contactPerson",
+                        principalTable: "ContactPersons",
                         principalColumn: "Id");
                 });
 
             migrationBuilder.CreateTable(
-                name: "employee",
+                name: "Employees",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "integer", nullable: false)
@@ -114,45 +114,45 @@ namespace Data.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_employee", x => x.Id);
+                    table.PrimaryKey("PK_Employees", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_employee_roles_RoleId",
+                        name: "FK_Employees_Roles_RoleId",
                         column: x => x.RoleId,
-                        principalTable: "roles",
+                        principalTable: "Roles",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
-                name: "service",
+                name: "Services",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    ServiceName = table.Column<string>(type: "text", nullable: true),
-                    Price = table.Column<int>(type: "integer", nullable: true),
+                    ServiceName = table.Column<string>(type: "text", nullable: false),
+                    Price = table.Column<decimal>(type: "numeric", nullable: false),
                     UnitId = table.Column<int>(type: "integer", nullable: false),
                     CurrencyId = table.Column<int>(type: "integer", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_service", x => x.Id);
+                    table.PrimaryKey("PK_Services", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_service_currencies_CurrencyId",
+                        name: "FK_Services_Currencies_CurrencyId",
                         column: x => x.CurrencyId,
-                        principalTable: "currencies",
+                        principalTable: "Currencies",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_service_units_UnitId",
+                        name: "FK_Services_Units_UnitId",
                         column: x => x.UnitId,
-                        principalTable: "units",
+                        principalTable: "Units",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
-                name: "customercontacts",
+                name: "CustomerContacts",
                 columns: table => new
                 {
                     CustomerId = table.Column<int>(type: "integer", nullable: false),
@@ -160,30 +160,30 @@ namespace Data.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_customercontacts", x => x.CustomerId);
+                    table.PrimaryKey("PK_CustomerContacts", x => x.CustomerId);
                     table.ForeignKey(
-                        name: "FK_customercontacts_contactPerson_ContactPersonId",
+                        name: "FK_CustomerContacts_ContactPersons_ContactPersonId",
                         column: x => x.ContactPersonId,
-                        principalTable: "contactPerson",
+                        principalTable: "ContactPersons",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_customercontacts_customer_CustomerId",
+                        name: "FK_CustomerContacts_Customers_CustomerId",
                         column: x => x.CustomerId,
-                        principalTable: "customer",
+                        principalTable: "Customers",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
-                name: "project",
+                name: "Projects",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     ProjectNumber = table.Column<int>(type: "integer", nullable: false),
-                    Name = table.Column<string>(type: "text", nullable: true),
-                    Description = table.Column<string>(type: "text", nullable: true),
+                    Name = table.Column<string>(type: "text", nullable: false),
+                    Description = table.Column<string>(type: "text", nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
                     UpdatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
                     StartDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
@@ -195,82 +195,82 @@ namespace Data.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_project", x => x.Id);
+                    table.PrimaryKey("PK_Projects", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_project_customer_CustomerId",
+                        name: "FK_Projects_Customers_CustomerId",
                         column: x => x.CustomerId,
-                        principalTable: "customer",
+                        principalTable: "Customers",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_project_employee_EmployeeId",
+                        name: "FK_Projects_Employees_EmployeeId",
                         column: x => x.EmployeeId,
-                        principalTable: "employee",
+                        principalTable: "Employees",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_project_service_ServiceId",
+                        name: "FK_Projects_Services_ServiceId",
                         column: x => x.ServiceId,
-                        principalTable: "service",
+                        principalTable: "Services",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_project_statusType_StatusId",
+                        name: "FK_Projects_StatusTypes_StatusId",
                         column: x => x.StatusId,
-                        principalTable: "statusType",
+                        principalTable: "StatusTypes",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateIndex(
-                name: "IX_customer_ContactPersonId",
-                table: "customer",
+                name: "IX_CustomerContacts_ContactPersonId",
+                table: "CustomerContacts",
                 column: "ContactPersonId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_customercontacts_ContactPersonId",
-                table: "customercontacts",
+                name: "IX_Customers_ContactPersonId",
+                table: "Customers",
                 column: "ContactPersonId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_employee_Email",
-                table: "employee",
+                name: "IX_Employees_Email",
+                table: "Employees",
                 column: "Email",
                 unique: true);
 
             migrationBuilder.CreateIndex(
-                name: "IX_employee_RoleId",
-                table: "employee",
+                name: "IX_Employees_RoleId",
+                table: "Employees",
                 column: "RoleId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_project_CustomerId",
-                table: "project",
+                name: "IX_Projects_CustomerId",
+                table: "Projects",
                 column: "CustomerId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_project_EmployeeId",
-                table: "project",
+                name: "IX_Projects_EmployeeId",
+                table: "Projects",
                 column: "EmployeeId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_project_ServiceId",
-                table: "project",
+                name: "IX_Projects_ServiceId",
+                table: "Projects",
                 column: "ServiceId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_project_StatusId",
-                table: "project",
+                name: "IX_Projects_StatusId",
+                table: "Projects",
                 column: "StatusId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_service_CurrencyId",
-                table: "service",
+                name: "IX_Services_CurrencyId",
+                table: "Services",
                 column: "CurrencyId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_service_UnitId",
-                table: "service",
+                name: "IX_Services_UnitId",
+                table: "Services",
                 column: "UnitId");
         }
 
@@ -278,34 +278,34 @@ namespace Data.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "customercontacts");
+                name: "CustomerContacts");
 
             migrationBuilder.DropTable(
-                name: "project");
+                name: "Projects");
 
             migrationBuilder.DropTable(
-                name: "customer");
+                name: "Customers");
 
             migrationBuilder.DropTable(
-                name: "employee");
+                name: "Employees");
 
             migrationBuilder.DropTable(
-                name: "service");
+                name: "Services");
 
             migrationBuilder.DropTable(
-                name: "statusType");
+                name: "StatusTypes");
 
             migrationBuilder.DropTable(
-                name: "contactPerson");
+                name: "ContactPersons");
 
             migrationBuilder.DropTable(
-                name: "roles");
+                name: "Roles");
 
             migrationBuilder.DropTable(
-                name: "currencies");
+                name: "Currencies");
 
             migrationBuilder.DropTable(
-                name: "units");
+                name: "Units");
         }
     }
 }

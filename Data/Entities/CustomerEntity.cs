@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Data.Entities;
 
-[Table("customer")]
+[Table("Customers")]
 public class CustomerEntity
 {
     [Key]
@@ -12,11 +12,11 @@ public class CustomerEntity
 
     public string? Name { get; set; }
 
-    [ForeignKey(nameof(ContactPerson))]
+    [ForeignKey(nameof(ContactPersons))]
     public int? ContactPersonId { get; set; }
 
     // Navigation to ContactPerson
-    public ContactPersonEntity? ContactPerson { get; set; }
+    public ContactPersonEntity? ContactPersons { get; set; }
 
     // Navigation (optional): If you want to see which Projects belong to this Customer
     public ICollection<ProjectEntity>? Projects { get; set; }

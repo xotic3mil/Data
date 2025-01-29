@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Data.Entities;
 
-[Table("currencies")]
+[Table("Currencies")]
 public class CurrencyEntity
 {
     [Key]

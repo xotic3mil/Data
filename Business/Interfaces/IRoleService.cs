@@ -3,7 +3,7 @@ using Business.Models;
 
 namespace Business.Interfaces
 {
-    public interface IRoleService : IBaseService<Roles, RolesRegForm, Roles>
+    public interface IRoleService
     {
         Task<Roles> CreateRole(RolesRegForm form);
         Task<Roles> UpdateRole(Roles role);

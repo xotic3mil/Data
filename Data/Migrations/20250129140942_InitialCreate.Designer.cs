@@ -12,8 +12,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Data.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20250122110052_InitialCreate3")]
-    partial class InitialCreate3
+    [Migration("20250129140942_InitialCreate")]
+    partial class InitialCreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -50,7 +50,7 @@ namespace Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("contactPerson");
+                    b.ToTable("ContactPersons");
                 });
 
             modelBuilder.Entity("Data.Entities.CurrencyEntity", b =>
@@ -67,7 +67,7 @@ namespace Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("currencies");
+                    b.ToTable("Currencies");
                 });
 
             modelBuilder.Entity("Data.Entities.CustomerContactPersonsEntity", b =>
@@ -82,7 +82,7 @@ namespace Data.Migrations
 
                     b.HasIndex("ContactPersonId");
 
-                    b.ToTable("customercontacts");
+                    b.ToTable("CustomerContacts");
                 });
 
             modelBuilder.Entity("Data.Entities.CustomerEntity", b =>
@@ -103,7 +103,7 @@ namespace Data.Migrations
 
                     b.HasIndex("ContactPersonId");
 
-                    b.ToTable("customer");
+                    b.ToTable("Customers");
                 });
 
             modelBuilder.Entity("Data.Entities.EmployeeEntity", b =>
@@ -140,7 +140,7 @@ namespace Data.Migrations
 
                     b.HasIndex("RoleId");
 
-                    b.ToTable("employee");
+                    b.ToTable("Employees");
                 });
 
             modelBuilder.Entity("Data.Entities.ProjectEntity", b =>
@@ -196,7 +196,7 @@ namespace Data.Migrations
 
                     b.HasIndex("StatusId");
 
-                    b.ToTable("project");
+                    b.ToTable("Projects");
                 });
 
             modelBuilder.Entity("Data.Entities.RolesEntity", b =>
@@ -213,7 +213,7 @@ namespace Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("roles");
+                    b.ToTable("Roles");
                 });
 
             modelBuilder.Entity("Data.Entities.ServiceEntity", b =>
@@ -227,10 +227,11 @@ namespace Data.Migrations
                     b.Property<int>("CurrencyId")
                         .HasColumnType("integer");
 
-                    b.Property<int?>("Price")
-                        .HasColumnType("integer");
+                    b.Property<decimal>("Price")
+                        .HasColumnType("numeric");
 
                     b.Property<string>("ServiceName")
+                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<int>("UnitId")
@@ -242,7 +243,7 @@ namespace Data.Migrations
 
                     b.HasIndex("UnitId");
 
-                    b.ToTable("service");
+                    b.ToTable("Services");
                 });
 
             modelBuilder.Entity("Data.Entities.StatusTypesEntity", b =>
@@ -259,7 +260,7 @@ namespace Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("statusType");
+                    b.ToTable("StatusTypes");
                 });
 
             modelBuilder.Entity("Data.Entities.UnitEntity", b =>
@@ -276,12 +277,12 @@ namespace Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("units");
+                    b.ToTable("Units");
                 });
 
             modelBuilder.Entity("Data.Entities.CustomerContactPersonsEntity", b =>
                 {
-                    b.HasOne("Data.Entities.ContactPersonEntity", "ContactPerson")
+                    b.HasOne("Data.Entities.ContactPersonEntity", "ContactPersons")
                         .WithMany()
                         .HasForeignKey("ContactPersonId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -293,18 +294,18 @@ namespace Data.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("ContactPerson");
+                    b.Navigation("ContactPersons");
 
                     b.Navigation("Customer");
                 });
 
             modelBuilder.Entity("Data.Entities.CustomerEntity", b =>
                 {
-                    b.HasOne("Data.Entities.ContactPersonEntity", "ContactPerson")
+                    b.HasOne("Data.Entities.ContactPersonEntity", "ContactPersons")
                         .WithMany()
                         .HasForeignKey("ContactPersonId");
 
-                    b.Navigation("ContactPerson");
+                    b.Navigation("ContactPersons");
                 });
 
             modelBuilder.Entity("Data.Entities.EmployeeEntity", b =>
@@ -355,21 +356,21 @@ namespace Data.Migrations
 
             modelBuilder.Entity("Data.Entities.ServiceEntity", b =>
                 {
-                    b.HasOne("Data.Entities.CurrencyEntity", "Currency")
+                    b.HasOne("Data.Entities.CurrencyEntity", "Currencies")
                         .WithMany()
                         .HasForeignKey("CurrencyId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Data.Entities.UnitEntity", "Unit")
+                    b.HasOne("Data.Entities.UnitEntity", "Units")
                         .WithMany()
                         .HasForeignKey("UnitId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("Currency");
+                    b.Navigation("Currencies");
 
-                    b.Navigation("Unit");
+                    b.Navigation("Units");
                 });
 
             modelBuilder.Entity("Data.Entities.CustomerEntity", b =>
