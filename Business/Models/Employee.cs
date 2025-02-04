@@ -8,6 +8,6 @@ public class Employee
     public string Phone { get; set; } = null!;
     public string Email { get; set; } = null!;
     public int RoleId { get; set; }
-
+    public Roles Roles { get; set; } = null!;
 
 }

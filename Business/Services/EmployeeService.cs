@@ -40,6 +40,7 @@ public class EmployeeService(IEmployeeRepository employeeRepository) : IEmployee
     {
         var employees = await _employeeRepository.GetAllAsync();
 
+
         if (!string.IsNullOrEmpty(search))
         {
             var filteredEmployees = employees.Where(e =>
@@ -51,6 +52,7 @@ public class EmployeeService(IEmployeeRepository employeeRepository) : IEmployee
         }
 
         return employees.Select(EmployeeFactory.Create);
+
     }
 
     public async Task<Employee> UpdateEmployee(Employee employee)

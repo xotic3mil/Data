@@ -22,7 +22,9 @@ public class ServiceFactory
         ServiceName = entity.ServiceName,
         Price = entity.Price,
         UnitId = entity.UnitId,
-        CurrencyId = entity.CurrencyId
+        CurrencyId = entity.CurrencyId,
+        Units = UnitFactory.Create(entity.Units),
+        Currencies = CurrencyFactory.Create(entity.Currencies)
 
     };
 

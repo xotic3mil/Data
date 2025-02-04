@@ -12,8 +12,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Data.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20250129140942_InitialCreate")]
-    partial class InitialCreate
+    [Migration("20250203215006_MakeContractEndDateNullable")]
+    partial class MakeContractEndDateNullable
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)

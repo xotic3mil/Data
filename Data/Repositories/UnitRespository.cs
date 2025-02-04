@@ -4,7 +4,7 @@ using Data.Interfaces;
 
 namespace Data.Repositories;
 
-internal class UnitRespository(AppDbContext context) : BaseRepository<UnitEntity>(context), IUnitEntity
+public class UnitRespository(AppDbContext context) : BaseRepository<UnitEntity>(context), IUnitRepository
 {
     private readonly AppDbContext _context = context;
 }

@@ -13,10 +13,12 @@ builder.Services.AddOpenApi();
 builder.Services.AddDbContext<AppDbContext>(x => x.UseNpgsql(builder.Configuration.GetConnectionString("PostgreSQL")));
 builder.Services.AddScoped<IEmployeeRepository, EmployeeRespository>();
 builder.Services.AddScoped<IRoleRepository, RoleRepository>();
+builder.Services.AddScoped<ICurrencyRepository, CurrencyRepository>();
 builder.Services.AddScoped<IServiceRepository, ServiceRepository>();
-
-
+builder.Services.AddScoped<IUnitRepository, UnitRespository>();
+builder.Services.AddScoped<IUnitService, UnitService>();
 builder.Services.AddScoped<IServicesService, ServicesService>();
+builder.Services.AddScoped<ICurrenciesService, CurrencyService>();
 builder.Services.AddScoped<IEmployeeService, EmployeeService>();
 builder.Services.AddScoped<IRoleService, RoleService>();
 

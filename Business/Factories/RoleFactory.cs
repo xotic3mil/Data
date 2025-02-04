@@ -20,7 +20,7 @@ namespace Business.Factories
         public static Roles Create(RolesEntity entity) => new()
         {
             Id = entity.Id,
-            RoleName = entity.RoleName ?? string.Empty
+            RoleName = entity.RoleName,
         };
     }
 }

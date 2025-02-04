@@ -2,8 +2,7 @@
 using Data.Entities;
 using Data.Interfaces;
 using Microsoft.EntityFrameworkCore;
-using System.Linq.Expressions;
-
+using System.Diagnostics;
 namespace Data.Repositories;
 
 public class EmployeeRespository(AppDbContext context) : BaseRepository<EmployeeEntity>(context), IEmployeeRepository
@@ -20,8 +19,16 @@ public class EmployeeRespository(AppDbContext context) : BaseRepository<Employee
         return employees;
     }
 
-    public async Task<IEnumerable<EmployeeEntity>> GetAllEmployees()
+    public override async Task<IEnumerable<EmployeeEntity>> GetAllAsync()
     {
-        return await _context.Employees.ToListAsync();
+        try {
+            return await _context.Employees.Include(e => e.Role).ToListAsync();
+        }
+        catch (Exception ex)
+        {
+            Debug.WriteLine($"Error Getting All Employees :: {ex.Message}");
+            return null!;
+        }
+
     }
 }

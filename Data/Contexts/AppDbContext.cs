@@ -20,11 +20,50 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
 
 protected override void OnModelCreating(ModelBuilder modelBuilder)
 {
-    modelBuilder.Entity<EmployeeEntity>()
-        .HasOne(e => e.Role)
-        .WithMany(r => r.Employees)
-        .HasForeignKey(e => e.RoleId)
-        .OnDelete(DeleteBehavior.Cascade);
-}
+        modelBuilder.Entity<EmployeeEntity>()
+           .HasOne(e => e.Role)
+           .WithMany(r => r.Employees)
+           .HasForeignKey(e => e.RoleId)
+           .OnDelete(DeleteBehavior.Restrict);
+
+        modelBuilder.Entity<ProjectEntity>()
+            .HasOne(p => p.Employee)
+            .WithMany(e => e.Projects)
+            .HasForeignKey(p => p.EmployeeId)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        modelBuilder.Entity<ProjectEntity>()
+            .HasOne(p => p.Status)
+            .WithMany(s => s.Projects)
+            .HasForeignKey(p => p.StatusId)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        modelBuilder.Entity<ProjectEntity>()
+            .HasOne(p => p.Service)
+            .WithMany(s => s.Projects)
+            .HasForeignKey(p => p.ServiceId)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        modelBuilder.Entity<ProjectEntity>()
+            .HasOne(p => p.Customer)
+            .WithMany(c => c.Projects)
+            .HasForeignKey(p => p.CustomerId)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        modelBuilder.Entity<CustomerEntity>()
+            .HasOne(c => c.ContactPersons)
+            .WithMany()
+            .HasForeignKey(c => c.ContactPersonId)
+            .OnDelete(DeleteBehavior.SetNull);
+
+        modelBuilder.Entity<CustomerContactPersonsEntity>()
+            .HasKey(ccp => new { ccp.CustomerId, ccp.ContactPersonId });
+
+
+        modelBuilder.Entity<CustomerContactPersonsEntity>()
+            .HasOne(ccp => ccp.ContactPersons)
+            .WithMany()
+            .HasForeignKey(ccp => ccp.ContactPersonId);
+    }
         
 }

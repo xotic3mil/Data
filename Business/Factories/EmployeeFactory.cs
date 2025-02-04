@@ -24,8 +24,8 @@ public static class EmployeeFactory
         LastName = entity.LastName,
         Email = entity.Email,
         Phone = entity.Phone,
-        RoleId = entity.RoleId
-        
+        RoleId = entity.RoleId,
+        Roles = entity.Role != null ? RoleFactory.Create(entity.Role) : null,
     };
 
     public static EmployeeEntity Create(Employee employee, int roleId) => new()
@@ -35,7 +35,7 @@ public static class EmployeeFactory
         LastName = employee.LastName,
         Email = employee.Email,
         Phone = employee.Phone,
-        RoleId = employee.RoleId
+        RoleId = employee.RoleId,
     };
 
 }

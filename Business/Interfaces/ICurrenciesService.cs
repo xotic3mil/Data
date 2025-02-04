@@ -1,12 +1,18 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Business.Dtos;
+using Business.Models;
 
-namespace Business.Interfaces
+namespace Business.Interfaces;
+
+public interface ICurrenciesService
 {
-    public class ICurrenciesService
-    {
-    }
+
+    public Task<Currencies> CreateCurrency(CurrencyRegForm form);
+
+    public Task<Currencies> GetCurrencyId(int id);
+
+    public Task<IEnumerable<Currencies>> GetCurrencies(string? search);
+
+    public Task<Currencies> UpdateCurrency(Currencies currencies);
+
+    public Task<bool> DeleteCurrency(int id);
 }
