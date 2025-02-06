@@ -1,0 +1,8 @@
+/**
+ * src/styles/settings.scss
+ *
+ * Configures SASS variables and Vuetify overwrites
+ */
+.v-application {
+  background: linear-gradient(180deg, #121212, #363636, #555555);
+}
