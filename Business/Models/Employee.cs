@@ -7,6 +7,8 @@ public class Employee
     public string LastName { get; set; } = null!;
     public string Phone { get; set; } = null!;
     public string Email { get; set; } = null!;
+
+    public DateOnly? ContractStartDate { get; set; }
     public int RoleId { get; set; }
     public Roles Roles { get; set; } = null!;
 

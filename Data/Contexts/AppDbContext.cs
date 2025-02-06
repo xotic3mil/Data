@@ -9,8 +9,7 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
     public DbSet<ProjectEntity> Projects { get; set; }
     public DbSet<StatusTypesEntity> StatusTypes { get; set; }
     public DbSet<CustomerEntity> Customers { get; set; }
-    public DbSet<ContactPersonEntity> ContactPerson { get; set; }
-    public DbSet<CustomerContactPersonsEntity> CustomerContactPersons { get; set; }
+    public DbSet<CustomerContactPersonEntity> ContactPerson { get; set; }
     public DbSet<EmployeeEntity> Employees { get; set; }
     public DbSet<ServiceEntity> Services { get; set; }
     public DbSet<RolesEntity> Roles { get; set; }
@@ -51,19 +50,11 @@ protected override void OnModelCreating(ModelBuilder modelBuilder)
             .OnDelete(DeleteBehavior.Restrict);
 
         modelBuilder.Entity<CustomerEntity>()
-            .HasOne(c => c.ContactPersons)
-            .WithMany()
-            .HasForeignKey(c => c.ContactPersonId)
-            .OnDelete(DeleteBehavior.SetNull);
+            .HasOne(c => c.ContactPerson)
+            .WithMany(p => p.Customers)
+            .HasForeignKey(c => c.CustomerContactPersonId)
+            .OnDelete(DeleteBehavior.Restrict);
 
-        modelBuilder.Entity<CustomerContactPersonsEntity>()
-            .HasKey(ccp => new { ccp.CustomerId, ccp.ContactPersonId });
-
-
-        modelBuilder.Entity<CustomerContactPersonsEntity>()
-            .HasOne(ccp => ccp.ContactPersons)
-            .WithMany()
-            .HasForeignKey(ccp => ccp.ContactPersonId);
     }
         
 }

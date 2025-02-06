@@ -26,6 +26,8 @@ public class EmployeeEntity
     [Phone]
     public string Phone { get; set; } = null!;
 
+    public DateOnly? ContractStartDate { get; set; }
+
     [Required]
     public int RoleId { get; set; }
     [ForeignKey(nameof(RoleId))]

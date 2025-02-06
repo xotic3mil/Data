@@ -25,7 +25,7 @@ public class StatusTypeService(IStatusTypeRepository statusTypeRepository) : ISt
         return result;
     }
 
-    public async Task<IEnumerable<StatusTypes>> GetStatus()
+    public async Task<IEnumerable<StatusTypes>> GetStatus(string? search)
     {
         var entities = await _statusTypeRepository.GetAllAsync();
         return entities.Select(StatusTypeFactory.Create);

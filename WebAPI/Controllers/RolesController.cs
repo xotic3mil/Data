@@ -7,14 +7,9 @@ namespace WebAPI.Controllers
 {
     [Route("api/roles")]
     [ApiController]
-    public class RolesController : ControllerBase
+    public class RolesController(IRoleService roleService) : ControllerBase
     {
-        private readonly IRoleService _roleService;
-
-        public RolesController(IRoleService roleService)
-        {
-            _roleService = roleService;
-        }
+        private readonly IRoleService _roleService = roleService;
 
         [HttpPost]
         public async Task<IActionResult> Create(RolesRegForm form)

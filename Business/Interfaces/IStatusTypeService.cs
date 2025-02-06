@@ -9,5 +9,5 @@ public interface IStatusTypeService
     Task<StatusTypes> UpdateStatus(StatusTypes status);
     Task<bool> DeleteStatus(int id);
     Task<StatusTypes> GetStatusById(int id);
-    Task<IEnumerable<StatusTypes>> GetStatus();
+    Task<IEnumerable<StatusTypes>> GetStatus(string? search);
 }

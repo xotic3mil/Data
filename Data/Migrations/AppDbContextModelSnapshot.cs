@@ -22,34 +22,6 @@ namespace Data.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
-            modelBuilder.Entity("Data.Entities.ContactPersonEntity", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("CustomerContactPerson")
-                        .HasColumnType("integer");
-
-                    b.Property<string>("Email")
-                        .HasColumnType("text");
-
-                    b.Property<string>("FirstName")
-                        .HasColumnType("text");
-
-                    b.Property<string>("LastName")
-                        .HasColumnType("text");
-
-                    b.Property<string>("Phone")
-                        .HasColumnType("text");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("ContactPersons");
-                });
-
             modelBuilder.Entity("Data.Entities.CurrencyEntity", b =>
                 {
                     b.Property<int>("Id")
@@ -67,19 +39,33 @@ namespace Data.Migrations
                     b.ToTable("Currencies");
                 });
 
-            modelBuilder.Entity("Data.Entities.CustomerContactPersonsEntity", b =>
+            modelBuilder.Entity("Data.Entities.CustomerContactPersonEntity", b =>
                 {
-                    b.Property<int>("CustomerId")
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("integer");
 
-                    b.Property<int>("ContactPersonId")
-                        .HasColumnType("integer");
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
-                    b.HasKey("CustomerId");
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasColumnType("text");
 
-                    b.HasIndex("ContactPersonId");
+                    b.Property<string>("FirstName")
+                        .IsRequired()
+                        .HasColumnType("text");
 
-                    b.ToTable("CustomerContacts");
+                    b.Property<string>("LastName")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("Phone")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("CustomerContactPerson");
                 });
 
             modelBuilder.Entity("Data.Entities.CustomerEntity", b =>
@@ -90,15 +76,16 @@ namespace Data.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
-                    b.Property<int?>("ContactPersonId")
-                        .HasColumnType("integer");
-
-                    b.Property<string>("Name")
+                    b.Property<string>("CompanyName")
+                        .IsRequired()
                         .HasColumnType("text");
+
+                    b.Property<int>("CustomerContactPersonId")
+                        .HasColumnType("integer");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("ContactPersonId");
+                    b.HasIndex("CustomerContactPersonId");
 
                     b.ToTable("Customers");
                 });
@@ -110,6 +97,9 @@ namespace Data.Migrations
                         .HasColumnType("integer");
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<DateOnly?>("ContractStartDate")
+                        .HasColumnType("date");
 
                     b.Property<string>("Email")
                         .IsRequired()
@@ -148,8 +138,8 @@ namespace Data.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
-                    b.Property<DateTime?>("CreatedAt")
-                        .HasColumnType("timestamp with time zone");
+                    b.Property<DateOnly?>("CreatedAt")
+                        .HasColumnType("date");
 
                     b.Property<int>("CustomerId")
                         .HasColumnType("integer");
@@ -161,8 +151,8 @@ namespace Data.Migrations
                     b.Property<int>("EmployeeId")
                         .HasColumnType("integer");
 
-                    b.Property<DateTime?>("EndDate")
-                        .HasColumnType("timestamp with time zone");
+                    b.Property<DateOnly>("EndDate")
+                        .HasColumnType("date");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -174,14 +164,14 @@ namespace Data.Migrations
                     b.Property<int>("ServiceId")
                         .HasColumnType("integer");
 
-                    b.Property<DateTime?>("StartDate")
-                        .HasColumnType("timestamp with time zone");
+                    b.Property<DateOnly>("StartDate")
+                        .HasColumnType("date");
 
                     b.Property<int>("StatusId")
                         .HasColumnType("integer");
 
-                    b.Property<DateTime?>("UpdatedAt")
-                        .HasColumnType("timestamp with time zone");
+                    b.Property<DateOnly?>("UpdatedAt")
+                        .HasColumnType("date");
 
                     b.HasKey("Id");
 
@@ -277,32 +267,15 @@ namespace Data.Migrations
                     b.ToTable("Units");
                 });
 
-            modelBuilder.Entity("Data.Entities.CustomerContactPersonsEntity", b =>
-                {
-                    b.HasOne("Data.Entities.ContactPersonEntity", "ContactPersons")
-                        .WithMany()
-                        .HasForeignKey("ContactPersonId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Data.Entities.CustomerEntity", "Customer")
-                        .WithMany()
-                        .HasForeignKey("CustomerId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("ContactPersons");
-
-                    b.Navigation("Customer");
-                });
-
             modelBuilder.Entity("Data.Entities.CustomerEntity", b =>
                 {
-                    b.HasOne("Data.Entities.ContactPersonEntity", "ContactPersons")
-                        .WithMany()
-                        .HasForeignKey("ContactPersonId");
+                    b.HasOne("Data.Entities.CustomerContactPersonEntity", "ContactPerson")
+                        .WithMany("Customers")
+                        .HasForeignKey("CustomerContactPersonId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
 
-                    b.Navigation("ContactPersons");
+                    b.Navigation("ContactPerson");
                 });
 
             modelBuilder.Entity("Data.Entities.EmployeeEntity", b =>
@@ -310,7 +283,7 @@ namespace Data.Migrations
                     b.HasOne("Data.Entities.RolesEntity", "Role")
                         .WithMany("Employees")
                         .HasForeignKey("RoleId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("Role");
@@ -321,25 +294,25 @@ namespace Data.Migrations
                     b.HasOne("Data.Entities.CustomerEntity", "Customer")
                         .WithMany("Projects")
                         .HasForeignKey("CustomerId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("Data.Entities.EmployeeEntity", "Employee")
                         .WithMany("Projects")
                         .HasForeignKey("EmployeeId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("Data.Entities.ServiceEntity", "Service")
                         .WithMany("Projects")
                         .HasForeignKey("ServiceId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("Data.Entities.StatusTypesEntity", "Status")
                         .WithMany("Projects")
                         .HasForeignKey("StatusId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("Customer");
@@ -368,6 +341,11 @@ namespace Data.Migrations
                     b.Navigation("Currencies");
 
                     b.Navigation("Units");
+                });
+
+            modelBuilder.Entity("Data.Entities.CustomerContactPersonEntity", b =>
+                {
+                    b.Navigation("Customers");
                 });
 
             modelBuilder.Entity("Data.Entities.CustomerEntity", b =>

@@ -17,6 +17,8 @@ public class EmployeeRegForm
     [Required]
     [Phone]
     public string? Phone { get; set; }
+
+    public DateOnly? ContractStartDate { get; set; }
     public int RoleId { get; set; }
 
 }

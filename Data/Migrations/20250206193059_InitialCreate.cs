@@ -7,28 +7,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Data.Migrations
 {
     /// <inheritdoc />
-    public partial class MakeContractEndDateNullable : Migration
+    public partial class InitialCreate : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.CreateTable(
-                name: "ContactPersons",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "integer", nullable: false)
-                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    FirstName = table.Column<string>(type: "text", nullable: true),
-                    LastName = table.Column<string>(type: "text", nullable: true),
-                    Email = table.Column<string>(type: "text", nullable: true),
-                    Phone = table.Column<string>(type: "text", nullable: true),
-                    CustomerContactPerson = table.Column<int>(type: "integer", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_ContactPersons", x => x.Id);
-                });
-
             migrationBuilder.CreateTable(
                 name: "Currencies",
                 columns: table => new
@@ -40,6 +23,22 @@ namespace Data.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Currencies", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "CustomerContactPerson",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    FirstName = table.Column<string>(type: "text", nullable: false),
+                    LastName = table.Column<string>(type: "text", nullable: false),
+                    Email = table.Column<string>(type: "text", nullable: false),
+                    Phone = table.Column<string>(type: "text", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_CustomerContactPerson", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -87,17 +86,18 @@ namespace Data.Migrations
                 {
                     Id = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    Name = table.Column<string>(type: "text", nullable: true),
-                    ContactPersonId = table.Column<int>(type: "integer", nullable: true)
+                    CompanyName = table.Column<string>(type: "text", nullable: false),
+                    CustomerContactPersonId = table.Column<int>(type: "integer", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Customers", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Customers_ContactPersons_ContactPersonId",
-                        column: x => x.ContactPersonId,
-                        principalTable: "ContactPersons",
-                        principalColumn: "Id");
+                        name: "FK_Customers_CustomerContactPerson_CustomerContactPersonId",
+                        column: x => x.CustomerContactPersonId,
+                        principalTable: "CustomerContactPerson",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
@@ -110,6 +110,7 @@ namespace Data.Migrations
                     LastName = table.Column<string>(type: "text", nullable: false),
                     Email = table.Column<string>(type: "text", nullable: false),
                     Phone = table.Column<string>(type: "text", nullable: false),
+                    ContractStartDate = table.Column<DateOnly>(type: "date", nullable: true),
                     RoleId = table.Column<int>(type: "integer", nullable: false)
                 },
                 constraints: table =>
@@ -120,7 +121,7 @@ namespace Data.Migrations
                         column: x => x.RoleId,
                         principalTable: "Roles",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
@@ -152,30 +153,6 @@ namespace Data.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "CustomerContacts",
-                columns: table => new
-                {
-                    CustomerId = table.Column<int>(type: "integer", nullable: false),
-                    ContactPersonId = table.Column<int>(type: "integer", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_CustomerContacts", x => x.CustomerId);
-                    table.ForeignKey(
-                        name: "FK_CustomerContacts_ContactPersons_ContactPersonId",
-                        column: x => x.ContactPersonId,
-                        principalTable: "ContactPersons",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_CustomerContacts_Customers_CustomerId",
-                        column: x => x.CustomerId,
-                        principalTable: "Customers",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "Projects",
                 columns: table => new
                 {
@@ -184,10 +161,10 @@ namespace Data.Migrations
                     ProjectNumber = table.Column<int>(type: "integer", nullable: false),
                     Name = table.Column<string>(type: "text", nullable: false),
                     Description = table.Column<string>(type: "text", nullable: false),
-                    CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
-                    UpdatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
-                    StartDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
-                    EndDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    CreatedAt = table.Column<DateOnly>(type: "date", nullable: true),
+                    UpdatedAt = table.Column<DateOnly>(type: "date", nullable: true),
+                    StartDate = table.Column<DateOnly>(type: "date", nullable: false),
+                    EndDate = table.Column<DateOnly>(type: "date", nullable: false),
                     StatusId = table.Column<int>(type: "integer", nullable: false),
                     EmployeeId = table.Column<int>(type: "integer", nullable: false),
                     ServiceId = table.Column<int>(type: "integer", nullable: false),
@@ -201,36 +178,31 @@ namespace Data.Migrations
                         column: x => x.CustomerId,
                         principalTable: "Customers",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
                         name: "FK_Projects_Employees_EmployeeId",
                         column: x => x.EmployeeId,
                         principalTable: "Employees",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
                         name: "FK_Projects_Services_ServiceId",
                         column: x => x.ServiceId,
                         principalTable: "Services",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
                         name: "FK_Projects_StatusTypes_StatusId",
                         column: x => x.StatusId,
                         principalTable: "StatusTypes",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateIndex(
-                name: "IX_CustomerContacts_ContactPersonId",
-                table: "CustomerContacts",
-                column: "ContactPersonId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Customers_ContactPersonId",
+                name: "IX_Customers_CustomerContactPersonId",
                 table: "Customers",
-                column: "ContactPersonId");
+                column: "CustomerContactPersonId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Employees_Email",
@@ -278,9 +250,6 @@ namespace Data.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "CustomerContacts");
-
-            migrationBuilder.DropTable(
                 name: "Projects");
 
             migrationBuilder.DropTable(
@@ -296,7 +265,7 @@ namespace Data.Migrations
                 name: "StatusTypes");
 
             migrationBuilder.DropTable(
-                name: "ContactPersons");
+                name: "CustomerContactPerson");
 
             migrationBuilder.DropTable(
                 name: "Roles");

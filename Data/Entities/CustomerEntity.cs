@@ -9,14 +9,14 @@ public class CustomerEntity
     [Key]
     [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
     public int Id { get; set; }
+    public string CompanyName { get; set; } = null!;
 
-    public string? Name { get; set; }
+    [Required]
+    [ForeignKey(nameof(CustomerContactPersonId))]
+    public int CustomerContactPersonId { get; set; }
 
-    [ForeignKey(nameof(ContactPersons))]
-    public int? ContactPersonId { get; set; }
-
-    // Navigation to ContactPerson
-    public ContactPersonEntity? ContactPersons { get; set; }
+    // Navigation to CustomerContactPerson 
+    public CustomerContactPersonEntity ContactPerson { get; set; } = null!;
 
     // Navigation (optional): If you want to see which Projects belong to this Customer
     public ICollection<ProjectEntity>? Projects { get; set; }

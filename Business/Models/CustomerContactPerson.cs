@@ -1,6 +1,6 @@
 ﻿namespace Business.Models;
 
-public class ContactPersons
+public class CustomerContactPerson
 {
     public int Id { get; set; }
     public string FirstName { get; set; } = null!;

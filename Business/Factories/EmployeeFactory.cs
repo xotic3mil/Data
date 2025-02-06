@@ -15,6 +15,7 @@ public static class EmployeeFactory
         Email = form.Email,
         Phone = form.Phone,
         RoleId = form.RoleId,
+        ContractStartDate = form.ContractStartDate,
     };
 
     public static Employee Create(EmployeeEntity entity) => new()
@@ -26,6 +27,7 @@ public static class EmployeeFactory
         Phone = entity.Phone,
         RoleId = entity.RoleId,
         Roles = entity.Role != null ? RoleFactory.Create(entity.Role) : null,
+        ContractStartDate = entity.ContractStartDate 
     };
 
     public static EmployeeEntity Create(Employee employee, int roleId) => new()
@@ -36,6 +38,7 @@ public static class EmployeeFactory
         Email = employee.Email,
         Phone = employee.Phone,
         RoleId = employee.RoleId,
+        ContractStartDate = employee.ContractStartDate,
     };
 
 }
