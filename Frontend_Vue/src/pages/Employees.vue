@@ -202,7 +202,7 @@ const headers = [
   { title: "Email", key: "email" },
   { title: "Phone", key: "phone" },
   { title: "Contract Start Date", key: "contractStartDate" },
-  { title: "Role", key: "roleName" },
+  { title: "Role", key: "roles.roleName" },
   { title: "Actions", key: "actions", sortable: false },
 ];
 
@@ -233,7 +233,7 @@ const formTitle = computed(() => {
 async function fetchEmployees() {
   try {
     const response = await fetch(
-      `https://localhost:7170/api/employees?search=${searchTerm.value}`
+      `http://192.168.1.6:5000/api/employees?search=${searchTerm.value}`
     );
     if (!response.ok) throw new Error("Failed to fetch employees");
 
@@ -264,7 +264,7 @@ async function fetchEmployees() {
 
 async function fetchRoles() {
   try {
-    const response = await fetch("https://localhost:7170/api/roles");
+    const response = await fetch("http://192.168.1.6:5000/api/roles");
     if (!response.ok) throw new Error("Failed to fetch roles");
     const data = await response.json();
     roles.value = data;
@@ -288,7 +288,7 @@ function deleteItem(item) {
 async function deleteItemConfirm() {
   try {
     const response = await fetch(
-      `https://localhost:7170/api/employees/${editedItem.value.id}`,
+      `http://192.168.1.6:5000/api/employees/${editedItem.value.id}`,
       {
         method: "DELETE",
       }
@@ -333,7 +333,7 @@ async function save(item) {
     }
     if (editedIndex.value > -1) {
       // Update existing
-      const response = await fetch("https://localhost:7170/api/employees", {
+      const response = await fetch("http://192.168.1.6:5000/api/employees", {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(editedItem.value),
@@ -356,7 +356,7 @@ async function save(item) {
       };
     } else {
       // Create new
-      const response = await fetch("https://localhost:7170/api/employees", {
+      const response = await fetch("http://192.168.1.6:5000/api/employees", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(editedItem.value),

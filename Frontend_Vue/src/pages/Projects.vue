@@ -9,38 +9,129 @@
         <v-data-table
           v-model:selected="expanded"
           :headers="headers"
-          :items="employees"
+          :items="projects"
+          :title="`Projects`"
           :sort-by="[{ key: 'id', order: 'asc' }]"
           item-value="id"
           show-expand
         >
-          <template v-slot:expanded-row="{ columns, item }">
+          <template v-slot:item.status="{ item }">
+            <v-chip :color="getStatusColor(item.status)" dark>
+              {{ item.status }}
+            </v-chip>
+          </template>
+
+          <template v-slot:item.description="{ item }">
+            {{
+              item.description.length > 50
+                ? item.description.substring(0, 50) + "..."
+                : item.description
+            }}
+          </template>
+
+          <template v-slot:item.customers="{ item }">
+            {{ item.customers.companyName }}
+          </template>
+          <template v-slot:expanded-row="{ columns, item }" class="rounded-xl">
             <tr>
               <td :colspan="columns.length" class="pa-5">
-                More info about {{ item.firstName }} Lorem ipsum dolor sit, amet
-                consectetur adipisicing elit. Temporibus illum ea et officia,
-                repudiandae mollitia! Nesciunt veritatis necessitatibus
-                explicabo. Autem repellat expedita atque blanditiis minus culpa
-                iure commodi omnis molestias! Lorem ipsum dolor sit, amet
-                consectetur adipisicing elit. Temporibus illum ea et officia,
-                repudiandae mollitia! Nesciunt veritatis necessitatibus
-                explicabo. Autem repellat expedita atque blanditiis minus culpa
-                iure commodi omnis molestias!
+                <v-card outlined class="elevation-10 rounded-lg">
+                  <v-card-title class="headline">{{ item.name }}</v-card-title>
+                  <v-divider></v-divider>
+                  <v-card-text>
+                    <v-list dense>
+                      <v-list-item>
+                        <v-list-item-content>
+                          <v-list-item-title>Description</v-list-item-title>
+                          <v-text-item-subtitle>{{
+                            item.description
+                          }}</v-text-item-subtitle>
+                        </v-list-item-content>
+                      </v-list-item>
+                      <v-list-item>
+                        <v-list-item-content>
+                          <v-list-item-title>Status</v-list-item-title>
+                        </v-list-item-content>
+                        <v-list-item-action>
+                          <v-chip :color="getStatusColor(item.status)" dark>{{
+                            item.status
+                          }}</v-chip>
+                        </v-list-item-action>
+                      </v-list-item>
+
+                      <v-list-item>
+                        <v-list-item-content>
+                          <v-list-item-title>Start Date</v-list-item-title>
+                          <v-list-item-subtitle>{{
+                            item.startDate
+                          }}</v-list-item-subtitle>
+                        </v-list-item-content>
+                      </v-list-item>
+
+                      <v-list-item>
+                        <v-list-item-content>
+                          <v-list-item-title>End Date</v-list-item-title>
+                          <v-list-item-subtitle>{{
+                            item.endDate
+                          }}</v-list-item-subtitle>
+                        </v-list-item-content>
+                      </v-list-item>
+
+                      <v-list-item>
+                        <v-list-item-content>
+                          <v-list-item-title>Service</v-list-item-title>
+                          <v-list-item-subtitle>{{
+                            item.service
+                          }}</v-list-item-subtitle>
+                        </v-list-item-content>
+                      </v-list-item>
+
+                      <v-list-item v-if="item.customers">
+                        <v-list-item-content>
+                          <v-list-item-title>Customer</v-list-item-title>
+                          <v-list-item-subtitle>{{
+                            item.customers.companyName
+                          }}</v-list-item-subtitle>
+                        </v-list-item-content>
+                      </v-list-item>
+
+                      <v-list-item v-if="item.customers.customerContactPerson">
+                        <v-list-item-content>
+                          <v-list-item-title>Contact Person</v-list-item-title>
+                          <v-list-item-subtitle>
+                            <v-icon small class="mr-1">mdi-account</v-icon>
+                            {{ item.customers.customerContactPerson.firstName }}
+                            {{ item.customers.customerContactPerson.lastName }}
+                          </v-list-item-subtitle>
+                          <v-list-item-subtitle>
+                            <v-icon small class="mr-1">mdi-email</v-icon>
+                            {{ item.customers.customerContactPerson.email }}
+                          </v-list-item-subtitle>
+                          <v-list-item-subtitle>
+                            <v-icon small class="mr-1">mdi-phone</v-icon>
+                            {{ item.customers.customerContactPerson.phone }}
+                          </v-list-item-subtitle>
+                        </v-list-item-content>
+                      </v-list-item>
+
+                      <v-list-item>
+                        <v-list-item-content>
+                          <v-list-item-title>Project Manager</v-list-item-title>
+                          <v-list-item-subtitle>{{
+                            item.employee
+                          }}</v-list-item-subtitle>
+                        </v-list-item-content>
+                      </v-list-item>
+                    </v-list>
+                  </v-card-text>
+                </v-card>
               </td>
             </tr>
           </template>
           <template v-slot:top>
             <v-toolbar flat>
+              <v-toolbar-title>Projects</v-toolbar-title>
               <v-spacer />
-              <v-text-field
-                v-model="searchTerm"
-                label="Search"
-                prepend-inner-icon="mdi-magnify"
-                variant="solo"
-                density="compact"
-                hide-details
-                class="mr-16"
-              ></v-text-field>
 
               <!-- New/Edit dialog -->
               <v-dialog v-model="dialog" max-width="500px">
@@ -51,7 +142,7 @@
                     variant="elevated"
                     class="mr-4"
                   >
-                    New Employee
+                    New Project
                   </v-btn>
                 </template>
 
@@ -65,44 +156,66 @@
                   <v-card-text>
                     <v-container>
                       <v-row>
-                        <v-col cols="12" sm="6">
+                        <v-col cols="12" sm="12">
                           <v-text-field
-                            v-model="editedItem.firstName"
-                            label="First Name *"
+                            v-model="editedItem.name"
+                            label="Project Name *"
                           ></v-text-field>
                         </v-col>
-                        <v-col cols="12" sm="6">
-                          <v-text-field
-                            v-model="editedItem.lastName"
-                            label="Last Name *"
-                          ></v-text-field>
+                        <v-col cols="12" sm="12">
+                          <v-textarea
+                            v-model="editedItem.description"
+                            label="Description *"
+                          ></v-textarea>
                         </v-col>
-                        <v-col cols="12" sm="6">
+                        <v-col cols="12" sm="12">
                           <v-text-field
-                            v-model="editedItem.email"
-                            label="Email *"
-                          ></v-text-field>
-                        </v-col>
-                        <v-col cols="12" sm="6">
-                          <v-text-field
-                            v-model="editedItem.phone"
-                            label="Phone *"
+                            type="date"
+                            v-model="editedItem.startDate"
+                            label="Contract Start Date *"
                           ></v-text-field>
                         </v-col>
                         <v-col cols="12" sm="12">
                           <v-text-field
                             type="date"
-                            v-model="editedItem.contractStartDate"
-                            label="Contract Start Date *"
+                            v-model="editedItem.endDate"
+                            label="Contract End Date *"
                           ></v-text-field>
                         </v-col>
                         <v-col cols="12" sm="12">
                           <v-select
-                            v-model="editedItem.roleId"
-                            :items="roles"
+                            v-model="editedItem.statusId"
+                            :items="status"
                             item-value="id"
-                            item-title="roleName"
-                            label="Role *"
+                            item-title="status"
+                            label="Status *"
+                          ></v-select>
+                        </v-col>
+                        <v-col cols="12" sm="12">
+                          <v-select
+                            v-model="editedItem.serviceId"
+                            :items="service"
+                            item-value="id"
+                            item-title="serviceName"
+                            label="Service *"
+                          ></v-select>
+                        </v-col>
+                        <v-col cols="12" sm="12">
+                          <v-select
+                            v-model="editedItem.customerId"
+                            :items="customer"
+                            item-value="id"
+                            item-title="companyName"
+                            label="Customer *"
+                          ></v-select>
+                        </v-col>
+                        <v-col cols="12" sm="12">
+                          <v-select
+                            v-model="editedItem.employeeId"
+                            :items="filteredEmployees"
+                            item-value="id"
+                            item-title="fullName"
+                            label="Project Manager *"
                           ></v-select>
                         </v-col>
                       </v-row>
@@ -155,17 +268,13 @@
           <template v-slot:item.actions="{ item }">
             <v-icon
               class="me-2"
-              color="blue-lighten-1"
+              color="blue-darken-1"
               size="small"
               @click="editItem(item)"
             >
               mdi-pencil
             </v-icon>
-            <v-icon
-              size="small"
-              color="red-lighten-1"
-              @click="deleteItem(item)"
-            >
+            <v-icon size="small" color="red-darken-2" @click="deleteItem(item)">
               mdi-delete
             </v-icon>
           </template>
@@ -183,72 +292,110 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, watch } from "vue";
+import { ref, computed, onMounted, watchEffect } from "vue";
 
 const expanded = ref(false);
-const isLoading = ref(true);
+const isLoading = ref(false);
 const dialog = ref(false);
 const dialogDelete = ref(false);
-const searchTerm = ref("");
-const roles = ref([]);
-const employees = ref([]);
+const status = ref([]);
+const customer = ref([]);
+const contactperson = ref([]);
+const service = ref([]);
+const employee = ref([]);
+const projects = ref([]);
 const editedIndex = ref(-1);
 const delay = ref(5000);
 
+const selectedRoleId = ref(1);
+const filteredEmployees = computed(() => {
+  return employee.value.filter(
+    (emp) => emp.roles && Number(emp.roles.id) === Number(selectedRoleId.value)
+  );
+});
+
 const headers = [
   { title: "ID", key: "id" },
-  { title: "First Name", key: "firstName" },
-  { title: "Last Name", key: "lastName" },
-  { title: "Email", key: "email" },
-  { title: "Phone", key: "phone" },
-  { title: "Contract Start Date", key: "contractStartDate" },
-  { title: "Role", key: "roleName" },
+  { title: "Name", key: "name" },
+  { title: "Description", key: "description" },
+  { title: "StartDate", key: "startDate" },
+  { title: "EndDate", key: "endDate" },
+  { title: "Status", key: "status" },
+  { title: "Service", key: "service" },
+  { title: "Customer", key: "customers" },
+  { title: "Project Manager", key: "employee" },
   { title: "Actions", key: "actions", sortable: false },
 ];
 
 const editedItem = ref({
   id: null,
-  firstName: "",
-  lastName: "",
-  email: "",
-  contractStartDate: null,
-  phone: "",
-  roleId: null,
+  name: "",
+  description: "",
+  startDate: null,
+  endDate: null,
+  statusId: null,
+  serviceId: null,
+  customerId: null,
+  employeeId: null,
 });
 
 const defaultItem = {
   id: null,
-  firstName: "",
-  lastName: "",
-  email: "",
-  contractStartDate: null,
-  phone: "",
-  roleId: null,
+  name: "",
+  description: "",
+  startDate: null,
+  endDate: null,
+  statusId: null,
+  serviceId: null,
+  customerId: null,
+  employeeId: null,
 };
 
+const statusColorMapping = {
+  New: "blue",
+  Open: "green",
+  "In Progress": "orange",
+  Pending: "amber",
+  "On Hold": "purple",
+  Resolved: "teal",
+  Closed: "grey",
+  Reopened: "indigo",
+  Cancelled: "red",
+  Archived: "black",
+};
+
+function getStatusColor(status) {
+  return statusColorMapping[status.trim()] || "default";
+}
+
 const formTitle = computed(() => {
-  return editedIndex.value === -1 ? "New Employee" : "Edit Employee";
+  return editedIndex.value === -1 ? "New Projects" : "Edit Project";
 });
 
-async function fetchEmployees() {
+async function fetchProjects() {
   try {
-    const response = await fetch(
-      `https://localhost:7170/api/employees?search=${searchTerm.value}`
-    );
-    if (!response.ok) throw new Error("Failed to fetch employees");
+    const response = await fetch(`http://192.168.1.6:5000/api/projects`);
+    if (!response.ok) throw new Error("Failed to fetch projects");
 
     const data = await response.json();
-    employees.value = data.map((emp) => ({
-      ...emp,
-      roleName: emp.roles ? emp.roles.roleName : "Unknown",
-    }));
-
+    console.log("Fetched projects:", data);
+    projects.value = data.map((proj) => {
+      const cust = customer.value.find((c) => c.id === proj.customerId);
+      return {
+        ...proj,
+        status: status.value.find((s) => s.id === proj.statusId).status,
+        service: service.value.find((s) => s.id === proj.serviceId).serviceName,
+        // Keep the entire customer object so we can access nested properties
+        customers: cust || {},
+        employee: employee.value.find((e) => e.id === proj.employeeId).fullName,
+      };
+    });
     // Reset delay and hide the snackbar on success
     delay.value = 5000;
     isLoading.value = false;
     snackbar.value.show = false;
   } catch (error) {
-    console.error("Error fetching employees:", error);
+    console.error("Error fetching projects:", error);
     snackbar.value = {
       show: true,
       message: `failed connection to system - Retrying in ${
@@ -257,30 +404,78 @@ async function fetchEmployees() {
       color: "error",
     };
     // Retry after delay and increase delay for consecutive failures
-    setTimeout(fetchEmployees, delay.value);
+    setTimeout(fetchProjects, delay.value);
     delay.value += 5000;
   }
 }
 
-async function fetchRoles() {
+async function fetchStatuses() {
   try {
-    const response = await fetch("https://localhost:7170/api/roles");
-    if (!response.ok) throw new Error("Failed to fetch roles");
+    const response = await fetch("http://192.168.1.6:5000/api/status");
+    if (!response.ok) throw new Error("Failed to fetch status");
     const data = await response.json();
-    roles.value = data;
+    status.value = data;
   } catch (error) {
-    console.error("Error fetching roles:", error);
+    console.error("Error fetching status:", error);
+  }
+}
+
+async function fetchCustomerContact() {
+  try {
+    const response = await fetch("http://192.168.1.6:5000/api/contactperson");
+    if (!response.ok)
+      throw new Error("Failed to fetch customer contact persons");
+    const data = await response.json();
+    customerContactPerson.value = data;
+  } catch (error) {
+    console.error("Error fetching customer contact persons:", error);
+  }
+}
+
+async function fetchEmployees() {
+  try {
+    const response = await fetch("http://192.168.1.6:5000/api/employees");
+    if (!response.ok) throw new Error("Failed to fetch employees");
+    const data = await response.json();
+    employee.value = data.map((emp) => ({
+      ...emp,
+      fullName: emp.firstName + " " + emp.lastName,
+    }));
+  } catch (error) {
+    console.error("Error fetching employees:", error);
+  }
+}
+
+async function fetchServices() {
+  try {
+    const response = await fetch("http://192.168.1.6:5000/api/services");
+    if (!response.ok) throw new Error("Failed to fetch services");
+    const data = await response.json();
+    service.value = data;
+  } catch (error) {
+    console.error("Error fetching services:", error);
+  }
+}
+
+async function fetchCustomers() {
+  try {
+    const response = await fetch("http://192.168.1.6:5000/api/customers");
+    if (!response.ok) throw new Error("Failed to fetch customers");
+    const data = await response.json();
+    customer.value = data;
+  } catch (error) {
+    console.error("Error fetching customers:", error);
   }
 }
 
 function editItem(item) {
-  editedIndex.value = employees.value.indexOf(item);
+  editedIndex.value = projects.value.indexOf(item);
   editedItem.value = Object.assign({}, item);
   dialog.value = true;
 }
 
 function deleteItem(item) {
-  editedIndex.value = employees.value.indexOf(item);
+  editedIndex.value = projects.value.indexOf(item);
   editedItem.value = Object.assign({}, item);
   dialogDelete.value = true;
 }
@@ -288,20 +483,20 @@ function deleteItem(item) {
 async function deleteItemConfirm() {
   try {
     const response = await fetch(
-      `https://localhost:7170/api/employees/${editedItem.value.id}`,
+      `http://192.168.1.6:5000/api/projects/${editedItem.value.id}`,
       {
         method: "DELETE",
       }
     );
     snackbar.value = {
       show: true,
-      message: "Employee was deleted successfully!",
+      message: "Project was deleted successfully!",
       color: "success",
     };
 
     if (!response.ok) throw new Error("Delete failed");
 
-    await fetchEmployees();
+    await fetchProjects();
     closeDelete();
   } catch (error) {
     console.error("Error:", error);
@@ -326,76 +521,93 @@ const snackbar = ref({
   color: "error",
 });
 
-async function save(item) {
+async function save() {
   try {
-    if (item.contractStartDate === "") {
-      item.contractStartDate = null;
-    }
+    const payload = {
+      id: editedItem.value.id,
+      name: editedItem.value.name,
+      description: editedItem.value.description,
+      startDate: editedItem.value.startDate,
+      endDate: editedItem.value.endDate,
+      statusId: editedItem.value.statusId,
+      serviceId: editedItem.value.serviceId,
+      customerId: editedItem.value.customerId,
+      employeeId: editedItem.value.employeeId,
+      Status:
+        status.value.find((s) => s.id === editedItem.value.statusId) || {},
+      Service:
+        service.value.find((s) => s.id === editedItem.value.serviceId) || {},
+      Customers:
+        customer.value.find((c) => c.id === editedItem.value.customerId) || {},
+      Employee:
+        employee.value.find((e) => e.id === editedItem.value.employeeId) || {},
+    };
+
+    let response;
     if (editedIndex.value > -1) {
-      // Update existing
-      const response = await fetch("https://localhost:7170/api/employees", {
+      // Update existing project
+      response = await fetch("http://192.168.1.6:5000/api/projects", {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(editedItem.value),
+        body: JSON.stringify(payload),
       });
-
       if (response.status === 409) {
         snackbar.value = {
           show: true,
-          message: "Email already exists",
+          message: "Project already exists",
           color: "error",
         };
         return;
       }
-
       if (!response.ok) throw new Error("Update failed");
       snackbar.value = {
         show: true,
-        message: "Employee updated successfully!",
+        message: "Project updated successfully!",
         color: "success",
       };
     } else {
-      // Create new
-      const response = await fetch("https://localhost:7170/api/employees", {
+      // Create new project
+      response = await fetch("http://192.168.1.6:5000/api/projects", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(editedItem.value),
+        body: JSON.stringify(payload),
       });
-
       if (response.status === 409) {
         snackbar.value = {
           show: true,
-          message: "Email already exists",
+          message: "Project already exists",
           color: "error",
         };
         return;
       }
-
       if (!response.ok) throw new Error("Create failed");
-
       snackbar.value = {
         show: true,
-        message: "Employee created successfully!",
+        message: "Project created successfully!",
         color: "success",
       };
     }
-    await fetchEmployees();
+    await fetchProjects();
     close();
   } catch (error) {
     console.error("Error:", error);
   }
 }
 
-watch(searchTerm, () => {
-  fetchEmployees();
+watchEffect()(() => {
+  fetchProjects();
 });
 
 onMounted(async () => {
-  await fetchRoles();
+  await fetchStatuses();
+  await fetchServices();
+  await fetchCustomers();
   await fetchEmployees();
+  await fetchCustomerContact();
+  await fetchProjects();
 });
 
 defineExpose({
-  fetchEmployees,
+  fetchProjects,
 });
 </script>

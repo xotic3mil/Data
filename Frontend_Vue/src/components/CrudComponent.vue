@@ -1,6 +1,6 @@
 <script setup>
 // filepath: /c:/Users/Emil3/Documents/EC Utbildning/vuetifty/src/components/CrudComponent.vue
-import { ref, defineProps, defineEmits, onMounted } from "vue";
+import { ref, defineProps, defineEmits } from "vue";
 
 const props = defineProps({
   api: { type: String, required: true },
@@ -11,9 +11,9 @@ const props = defineProps({
   deleteItemConfirm: { type: Function, required: true },
 });
 
-const emits = defineEmits(["edit-item", "delete-item"]);
+const emits = defineEmits(["refresh"]);
 
-const isLoading = ref(true);
+const isLoading = ref(false);
 const fetchDelay = ref(5000);
 const internalItems = ref([]);
 
@@ -31,40 +31,15 @@ const internalEditedIndex = ref(-1);
 
 // NEW: Use the passed defaultItem if provided, otherwise build one from formFields.
 const internalDefaultItem = ref(
-  props.defaultItem
-    ? { ...props.defaultItem }
-    : (() => {
-        const obj = {};
-        props.formFields.forEach((field) => {
-          obj[field.key] = "";
-        });
-        obj.id = null;
-        return obj;
-      })()
+  (() => {
+    const obj = {};
+    props.formFields.forEach((field) => {
+      obj[field.key] = "";
+    });
+    obj.id = null;
+    return obj;
+  })()
 );
-
-async function fetchItems() {
-  try {
-    const response = await fetch(props.api);
-    if (!response.ok) throw new Error("Failed to fetch " + props.title);
-    const data = await response.json();
-    internalItems.value = data;
-    isLoading.value = false;
-    snackbar.value.show = false;
-    fetchDelay.value = 5000;
-  } catch (error) {
-    console.error("Error fetching items:", error);
-    snackbar.value = {
-      show: true,
-      message: `${error.message} - Retrying in ${
-        fetchDelay.value / 1000
-      } seconds...`,
-      color: "error",
-    };
-    setTimeout(fetchItems, fetchDelay.value);
-    fetchDelay.value += 5000;
-  }
-}
 
 function handleNewItem() {
   internalEditedIndex.value = -1;
@@ -88,7 +63,7 @@ async function saveItem() {
   try {
     await props.save(internalEditedItem.value);
     internalDialog.value = false;
-    fetchItems();
+    fetchItems("refresh");
   } catch (error) {
     console.error("Error in save:", error);
   }
@@ -98,7 +73,7 @@ async function confirmDelete() {
   try {
     await props.deleteItemConfirm(internalEditedItem.value.id);
     internalDialogDelete.value = false;
-    fetchItems();
+    fetchItems("refresh");
   } catch (error) {
     console.error("Error in delete:", error);
   }
@@ -111,16 +86,6 @@ function closeDialog() {
 function closeDeleteDialog() {
   internalDialogDelete.value = false;
 }
-
-onMounted(async () => {
-  await fetchItems();
-});
-
-const tableHeaders = ref([
-  { text: "Id", value: "id" },
-  { text: "Role", value: "roleName" },
-  { text: "Actions", value: "actions", sortable: false },
-]);
 </script>
 
 <template>
@@ -130,8 +95,8 @@ const tableHeaders = ref([
     </template>
     <template v-else>
       <v-data-table
-        :headers="tableHeaders"
-        :items="internalItems"
+        :headers="props.headers"
+        :items="props.items"
         item-value="id"
         class="elevation-1"
       >
@@ -206,12 +171,12 @@ const tableHeaders = ref([
           </v-toolbar>
         </template>
         <template v-slot:item.actions="{ item }">
-          <v-btn icon small @click="handleEdit(item)">
-            <v-icon>mdi-pencil</v-icon>
-          </v-btn>
-          <v-btn icon small @click="handleDelete(item)">
-            <v-icon>mdi-delete</v-icon>
-          </v-btn>
+          <v-icon color="blue" class="me-2" icon small @click="handleEdit(item)"
+            >mdi-pencil</v-icon
+          >
+          <v-icon color="red" icon small @click="handleDelete(item)"
+            >mdi-delete</v-icon
+          >
         </template>
       </v-data-table>
     </template>

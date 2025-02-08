@@ -3,6 +3,7 @@ using Business.Interfaces;
 using Business.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using System.Diagnostics;
 
 namespace WebAPI.Controllers
 {
@@ -15,6 +16,7 @@ namespace WebAPI.Controllers
         [HttpPost]
         public async Task<IActionResult> Create(ProjectRegForm form)
         {
+            Debug.WriteLine(form);
             if (!ModelState.IsValid)
             {
                 return BadRequest(new

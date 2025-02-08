@@ -19,7 +19,7 @@ public class CustomerFactory
     {
         Id = entity.Id,
         CompanyName = entity.CompanyName,
-        // CustomerContactPersonId = entity.CustomerContactPersonId,
+        CustomerContactPersonId = entity.CustomerContactPersonId,
         CustomerContactPerson = entity.ContactPerson != null ? CustomerContactPersonFactory.Create(entity.ContactPerson) : null,
     };
 
@@ -27,6 +27,6 @@ public class CustomerFactory
     {
         Id = customers.Id,
         CompanyName = customers.CompanyName,
-        // CustomerContactPersonId = customers.CustomerContactPersonId,
+        CustomerContactPersonId = customers.CustomerContactPersonId,
     };
 }

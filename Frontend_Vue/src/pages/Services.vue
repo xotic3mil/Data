@@ -178,7 +178,7 @@ const formTitle = computed(() =>
 
 async function fetchServices() {
   try {
-    const response = await fetch(`https://localhost:7170/api/services?`);
+    const response = await fetch(`http://192.168.1.6:5000/api/services?`);
     if (!response.ok) throw new Error("Failed to fetch services");
     const rawServices = await response.json();
     // Map each service object to include the actual unit and currency values
@@ -200,7 +200,7 @@ async function fetchServices() {
 
 async function fetchUnits() {
   try {
-    const response = await fetch("https://localhost:7170/api/units");
+    const response = await fetch("http://192.168.1.6:5000/api/units");
     if (!response.ok) throw new Error("Failed to fetch units");
     units.value = await response.json();
   } catch (error) {
@@ -210,7 +210,7 @@ async function fetchUnits() {
 
 async function fetchCurrencies() {
   try {
-    const response = await fetch("https://localhost:7170/api/currencies");
+    const response = await fetch("http://192.168.1.6:5000/api/currencies");
     if (!response.ok) throw new Error("Failed to fetch currencies");
     currencies.value = await response.json();
   } catch (error) {
@@ -233,7 +233,7 @@ function deleteItem(item) {
 async function deleteItemConfirm() {
   try {
     const response = await fetch(
-      `https://localhost:7170/api/services/${editedItem.value.id}`,
+      `http://192.168.1.6:5000/api/services/${editedItem.value.id}`,
       {
         method: "DELETE",
       }
@@ -275,7 +275,7 @@ async function save() {
   try {
     if (editedIndex.value > -1) {
       // Update existing
-      const response = await fetch("https://localhost:7170/api/services", {
+      const response = await fetch("http://192.168.1.6:5000/api/services", {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(editedItem.value),
@@ -298,7 +298,7 @@ async function save() {
       };
     } else {
       // Create new
-      const response = await fetch("https://localhost:7170/api/services", {
+      const response = await fetch("http://192.168.1.6:5000/api/services", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(editedItem.value),

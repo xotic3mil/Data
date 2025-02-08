@@ -7,6 +7,11 @@ const api = "https://localhost:7170/api/roles";
 // Define the form fields to be used by CrudComponent.
 // Note: "id" is created as read-only (disabled) and "roles" is your role name field.
 const formFields = [{ label: "Role", key: "roleName", type: "text" }];
+const headers = [
+  { text: "Id", value: "id" },
+  { text: "Role", value: "roleName" },
+  { text: "Actions", value: "actions", sortable: false },
+];
 
 const snackbar = ref({
   show: false,
@@ -86,9 +91,11 @@ async function deleteItemConfirm(id) {
 <template>
   <div>
     <CrudComponent
+      max-width="800px"
       :api="api"
       title="Roles"
       :formFields="formFields"
+      :headers="headers"
       :save="save"
       :deleteItemConfirm="deleteItemConfirm"
       :snackbar="snackbar"

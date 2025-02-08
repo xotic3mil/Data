@@ -23,8 +23,8 @@ public class ServiceFactory
         Price = entity.Price,
         UnitId = entity.UnitId,
         CurrencyId = entity.CurrencyId,
-        Units = UnitFactory.Create(entity.Units),
-        Currencies = CurrencyFactory.Create(entity.Currencies)
+        Units = entity.Units != null ? UnitFactory.Create(entity.Units) : null,
+        Currencies = entity.Currencies != null ? CurrencyFactory.Create(entity.Currencies) : null,
 
     };
 

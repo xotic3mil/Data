@@ -6,6 +6,8 @@ namespace Business.Factories
 {
     public static class RoleFactory
     {
+        public static RolesRegForm Create() => new();
+
         public static RolesEntity Create(RolesRegForm form) => new()
         {
             RoleName = form.RoleName

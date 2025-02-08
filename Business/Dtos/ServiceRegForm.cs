@@ -10,4 +10,6 @@ public class ServiceRegForm
     public int UnitId { get; set; }
     public int CurrencyId { get; set; }
 
+
+
 }

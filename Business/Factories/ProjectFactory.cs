@@ -32,10 +32,14 @@ namespace Business.Factories
             Description = entity.Description,
             StartDate = entity.StartDate,
             EndDate = entity.EndDate,
+            ServiceId = entity.ServiceId,
             Service = entity.Service != null ? ServiceFactory.Create(entity.Service) : null,
             Customers = entity.Customer != null ? CustomerFactory.Create(entity.Customer) : null,
+            CustomerId = entity.CustomerId,
             Employee = entity.Employee != null ? EmployeeFactory.Create(entity.Employee) : null,
+            EmployeeId = entity.EmployeeId,
             Status = entity.Status != null ? StatusTypeFactory.Create(entity.Status) : null,
+            StatusId = entity.StatusId,
         };
 
         public static ProjectEntity Create(Projects projects) => new()

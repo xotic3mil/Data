@@ -39,10 +39,10 @@ namespace Business.Services
 
         public async Task<IEnumerable<Projects>> GetProjects(string? search)
         {
-            var employees = await _projectRespository.GetAllAsync();
+            var projects = await _projectRespository.GetAllAsync();
 
 
-            return employees.Select(ProjectFactory.Create);
+            return projects.Select(ProjectFactory.Create);
 
         }
 
