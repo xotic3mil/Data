@@ -13,14 +13,14 @@ public class StatusTypeFactory
         Status = form.Status
     };
 
-    public static StatusTypes Create(StatusTypesEntity status) => new()
+    public static StatusTypes Create(StatusTypesEntity entity) => new()
     {
-        Id = status.Id,
-        Status = status.Status
+        Id = entity.Id,
+        Status = entity.Status
     };
-    public static StatusTypesEntity Create(StatusTypes status, int statusId) => new()
+    public static StatusTypesEntity Create(StatusTypes status) => new()
     {
         Id = status.Id,
-        Status = status.Status ?? string.Empty
+        Status = status.Status 
     };
 }

@@ -2,7 +2,9 @@ using Business.Dtos;
 using Business.Factories;
 using Business.Interfaces;
 using Business.Models;
+using Data.Entities;
 using Data.Interfaces;
+using Data.Repositories;
 
 namespace Business.Services
 {
@@ -12,7 +14,14 @@ namespace Business.Services
 
         public async Task<Roles> CreateRole(RolesRegForm form)
         {
-            var roleEntity = RoleFactory.Create(form);
+            var roleEntity = await _roleRepository.GetAsync(x => x.RoleName == form.RoleName);
+
+            if (roleEntity != null)
+            {
+                return null!;
+            }
+
+            roleEntity = RoleFactory.Create(form);
             roleEntity = await _roleRepository.CreateAsync(roleEntity);
             return RoleFactory.Create(roleEntity);
         }

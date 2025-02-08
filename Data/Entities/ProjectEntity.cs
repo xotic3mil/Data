@@ -13,8 +13,7 @@ public class ProjectEntity
     [Required]
     public int ProjectNumber { get; set; }
     public string Name { get; set; } = null!;
-    [StringLength(250)]
-   public string Description { get; set; } = null!;
+    public string Description { get; set; } = null!;
     public DateOnly? CreatedAt { get; set; }
     public DateOnly? UpdatedAt { get; set; }
     public DateOnly StartDate { get; set; }

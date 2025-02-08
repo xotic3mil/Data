@@ -11,7 +11,7 @@ public class StatusTypesEntity
     public int Id { get; set; }
 
     [Required]
-    public string Status { get; set; } = default!;
+    public string Status { get; set; } = null!;
 
     // Navigation (optional): If you want to see which Projects are using this status
     public ICollection<ProjectEntity>? Projects { get; set; }

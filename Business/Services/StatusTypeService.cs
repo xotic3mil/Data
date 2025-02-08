@@ -13,9 +13,16 @@ public class StatusTypeService(IStatusTypeRepository statusTypeRepository) : ISt
 
     public async Task<StatusTypes> CreateStatus(StatusTypeRegForm form)
     {
-            var statusEntity = StatusTypeFactory.Create(form);
-            statusEntity = await _statusTypeRepository.CreateAsync(statusEntity);
-            return StatusTypeFactory.Create(statusEntity);
+        var statusTypeEntity = await _statusTypeRepository.GetAsync(x => x.Status == form.Status);
+
+        if (statusTypeEntity != null)
+        {
+            return null!;
+        }
+
+        statusTypeEntity = StatusTypeFactory.Create(form);
+        statusTypeEntity = await _statusTypeRepository.CreateAsync(statusTypeEntity);
+        return StatusTypeFactory.Create(statusTypeEntity);
 
     }
 
@@ -39,7 +46,7 @@ public class StatusTypeService(IStatusTypeRepository statusTypeRepository) : ISt
 
     public async Task<StatusTypes> UpdateStatus(StatusTypes status)
     {
-        var statusEntity = StatusTypeFactory.Create(status, status.Id);
+        var statusEntity = StatusTypeFactory.Create(status);
         statusEntity = await _statusTypeRepository.UpdateAsync(x => x.Id == status.Id, statusEntity);
         return StatusTypeFactory.Create(statusEntity);
     }

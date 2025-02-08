@@ -80,7 +80,7 @@ namespace Business.Test.Factories
             };
 
             // Act
-            var result = StatusTypeFactory.Create(statusType, statusType.Id);
+            var result = StatusTypeFactory.Create(statusType);
 
             // Assert
             Assert.NotNull(result);
