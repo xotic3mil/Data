@@ -2,7 +2,7 @@
 import { ref, onMounted } from "vue";
 import CrudComponent from "@/components/CrudComponent.vue";
 
-const api = "https://localhost:7170/api/roles";
+const api = "http://192.168.1.6:5000/api/roles";
 
 // Define the form fields to be used by CrudComponent.
 // Note: "id" is created as read-only (disabled) and "roles" is your role name field.
@@ -18,6 +18,8 @@ const snackbar = ref({
   message: "",
   color: "error",
 });
+
+
 
 // The save and deleteItemConfirm functions remain the same.
 async function save(item) {

@@ -2,7 +2,7 @@
 import { ref, onMounted } from "vue";
 import CrudComponent from "@/components/CrudComponent.vue";
 
-const api = "https://localhost:7170/api/customers";
+const api = "http://192.168.1.6:5000/api/customers";
 
 // Fetch and transform customers
 const customers = ref([]);
@@ -76,7 +76,7 @@ async function deleteItemConfirm(id) {
     <CrudComponent
       max-width="80%"
       :api="api"
-      title="Roles"
+      title="Customers"
       :formFields="[
         { text: 'Company Name', key: 'companyName', type: 'text' },
         { text: 'Contact Person', key: 'customerContactPerson', type: 'text' },

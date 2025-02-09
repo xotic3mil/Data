@@ -47,6 +47,7 @@ namespace Business.Test.Services
             Assert.NotNull(result);
             Assert.Equal("John", result.FirstName);
             Assert.Equal("Doe", result.LastName);
+            
         }
 
         [Fact]
@@ -136,7 +137,6 @@ namespace Business.Test.Services
             Assert.Equal("Doe", result.LastName);
             Assert.Equal("john.doe@example.com", result.Email);
         }
-
 
     }
 
