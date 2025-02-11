@@ -7,6 +7,7 @@
       </template>
       <template v-else>
         <v-data-table
+          :key="projects.length"
           v-model:selected="expanded"
           :headers="headers"
           :items="projects"
@@ -21,6 +22,12 @@
             </v-chip>
           </template>
 
+          <template v-slot:item.priority="{ item }">
+            <v-chip :color="getpriorityColor(item.priority)" dark>
+              {{ item.priority }}
+            </v-chip>
+          </template>
+
           <template v-slot:item.description="{ item }">
             {{
               item.description.length > 50
@@ -32,97 +39,168 @@
           <template v-slot:item.customers="{ item }">
             {{ item.customers.companyName }}
           </template>
-          <template v-slot:expanded-row="{ columns, item }" class="rounded-xl">
+
+          <template v-slot:item.employee="{ item }">
+            {{ item.employee.fullName }}
+          </template>
+
+          <template v-slot:expanded-row="{ columns, item }">
             <tr>
-              <td :colspan="columns.length" class="pa-5">
-                <v-card outlined class="elevation-10 rounded-lg">
-                  <v-card-title class="headline">{{ item.name }}</v-card-title>
+              <td :colspan="columns.length" class="pa-10">
+                <v-card
+                  outlined
+                  class="elevation-5 rounded-lg"
+                  :style="{
+                    border: `2px solid`,
+                  }"
+                >
+                  <v-card-title>
+                    <div
+                      class="d-flex justify-space-between align-center"
+                      style="width: 100%"
+                    >
+                      <span class="headline">{{ item.name }}</span>
+                      <span class="subtitle-2"
+                        >Project-ID: {{ item.projectNumber }}</span
+                      >
+                    </div>
+                  </v-card-title>
+
                   <v-divider></v-divider>
+
                   <v-card-text>
-                    <v-list dense>
-                      <v-list-item>
-                        <v-list-item-content>
-                          <v-list-item-title>Description</v-list-item-title>
-                          <v-text-item-subtitle>{{
-                            item.description
-                          }}</v-text-item-subtitle>
-                        </v-list-item-content>
-                      </v-list-item>
-                      <v-list-item>
-                        <v-list-item-content>
-                          <v-list-item-title>Status</v-list-item-title>
-                        </v-list-item-content>
-                        <v-list-item-action>
-                          <v-chip :color="getStatusColor(item.status)" dark>{{
-                            item.status
-                          }}</v-chip>
-                        </v-list-item-action>
-                      </v-list-item>
+                    <!-- Project Details Section -->
+                    <v-row>
+                      <v-col cols="12" md="6">
+                        <v-list two-line>
+                          <v-list-item>
+                            <v-list-item-content>
+                              <v-list-item-title>Status</v-list-item-title>
+                            </v-list-item-content>
+                            <v-list-item-action>
+                              <v-chip
+                                :color="getStatusColor(item.status)"
+                                dark
+                                >{{ item.status }}</v-chip
+                              >
+                            </v-list-item-action>
+                          </v-list-item>
+                          <v-list-item>
+                            <v-list-item-content>
+                              <v-list-item-title class="font-weight-bold"
+                                >Description
+                              </v-list-item-title>
+                              <div class="full-text">
+                                {{ item.description }}
+                              </div>
+                            </v-list-item-content>
+                          </v-list-item>
+                          <v-list-item>
+                            <v-list-item-content>
+                              <v-list-item-title class="font-weight-bold"
+                                >Dates</v-list-item-title
+                              >
+                              <v-list-item-subtitle>
+                                Start Date: {{ item.startDate }}
+                              </v-list-item-subtitle>
+                              <v-list-item-subtitle>
+                                End Date: {{ item.endDate }}
+                              </v-list-item-subtitle>
+                            </v-list-item-content>
+                          </v-list-item>
+                          <v-list-item>
+                            <v-list-item-content>
+                              <v-list-item-title class="font-weight-bold"
+                                >Priority</v-list-item-title
+                              >
+                              <v-list-item-subtitle>
+                                <v-chip
+                                  :color="getpriorityColor(item.priority)"
+                                  dark
+                                >
+                                  {{ item.priority }}
+                                </v-chip>
+                              </v-list-item-subtitle>
+                            </v-list-item-content>
+                          </v-list-item>
+                        </v-list>
+                      </v-col>
 
-                      <v-list-item>
-                        <v-list-item-content>
-                          <v-list-item-title>Start Date</v-list-item-title>
-                          <v-list-item-subtitle>{{
-                            item.startDate
-                          }}</v-list-item-subtitle>
-                        </v-list-item-content>
-                      </v-list-item>
+                      <v-col cols="12" md="6">
+                        <v-list two-line>
+                          <v-list-item v-if="item.customers">
+                            <v-list-item-content>
+                              <v-list-item-title class="font-weight-bold"
+                                >Customer</v-list-item-title
+                              >
+                              <v-list-item-subtitle>
+                                <v-icon small class="mr-1">mdi-domain</v-icon>
+                                {{ item.customers.companyName }}
+                              </v-list-item-subtitle>
+                            </v-list-item-content>
+                          </v-list-item>
+                          <v-list-item
+                            v-if="
+                              item.customers &&
+                              item.customers.customerContactPerson
+                            "
+                          >
+                            <v-list-item-content>
+                              <v-list-item-title class="font-weight-bold"
+                                >Contact Person</v-list-item-title
+                              >
+                              <v-list-item-subtitle>
+                                <v-icon small class="mr-1">mdi-account</v-icon>
+                                {{
+                                  item.customers.customerContactPerson.firstName
+                                }}
+                                {{
+                                  item.customers.customerContactPerson.lastName
+                                }}
+                              </v-list-item-subtitle>
+                              <v-list-item-subtitle>
+                                <v-icon small class="mr-1">mdi-email</v-icon>
+                                {{ item.customers.customerContactPerson.email }}
+                              </v-list-item-subtitle>
+                              <v-list-item-subtitle>
+                                <v-icon small class="mr-1">mdi-phone</v-icon>
+                                {{ item.customers.customerContactPerson.phone }}
+                              </v-list-item-subtitle>
+                            </v-list-item-content>
+                          </v-list-item>
+                        </v-list>
+                      </v-col>
+                    </v-row>
 
-                      <v-list-item>
-                        <v-list-item-content>
-                          <v-list-item-title>End Date</v-list-item-title>
-                          <v-list-item-subtitle>{{
-                            item.endDate
-                          }}</v-list-item-subtitle>
-                        </v-list-item-content>
-                      </v-list-item>
+                    <v-divider></v-divider>
 
-                      <v-list-item>
-                        <v-list-item-content>
-                          <v-list-item-title>Service</v-list-item-title>
-                          <v-list-item-subtitle>{{
-                            item.service
-                          }}</v-list-item-subtitle>
-                        </v-list-item-content>
-                      </v-list-item>
-
-                      <v-list-item v-if="item.customers">
-                        <v-list-item-content>
-                          <v-list-item-title>Customer</v-list-item-title>
-                          <v-list-item-subtitle>{{
-                            item.customers.companyName
-                          }}</v-list-item-subtitle>
-                        </v-list-item-content>
-                      </v-list-item>
-
-                      <v-list-item v-if="item.customers.customerContactPerson">
-                        <v-list-item-content>
-                          <v-list-item-title>Contact Person</v-list-item-title>
-                          <v-list-item-subtitle>
-                            <v-icon small class="mr-1">mdi-account</v-icon>
-                            {{ item.customers.customerContactPerson.firstName }}
-                            {{ item.customers.customerContactPerson.lastName }}
-                          </v-list-item-subtitle>
-                          <v-list-item-subtitle>
-                            <v-icon small class="mr-1">mdi-email</v-icon>
-                            {{ item.customers.customerContactPerson.email }}
-                          </v-list-item-subtitle>
-                          <v-list-item-subtitle>
-                            <v-icon small class="mr-1">mdi-phone</v-icon>
-                            {{ item.customers.customerContactPerson.phone }}
-                          </v-list-item-subtitle>
-                        </v-list-item-content>
-                      </v-list-item>
-
-                      <v-list-item>
-                        <v-list-item-content>
-                          <v-list-item-title>Project Manager</v-list-item-title>
-                          <v-list-item-subtitle>{{
-                            item.employee
-                          }}</v-list-item-subtitle>
-                        </v-list-item-content>
-                      </v-list-item>
-                    </v-list>
+                    <!-- Project Manager Section -->
+                    <v-row class="mt-3">
+                      <v-col cols="12">
+                        <v-list>
+                          <v-list-item>
+                            <v-list-item-content>
+                              <v-list-item-title class="font-weight-bold"
+                                >Project Manager</v-list-item-title
+                              >
+                              <v-list-item-subtitle>
+                                <v-icon small class="mr-1">mdi-account</v-icon>
+                                {{ item.employee.firstName }}
+                                {{ item.employee.lastName }}
+                              </v-list-item-subtitle>
+                              <v-list-item-subtitle>
+                                <v-icon small class="mr-1">mdi-email</v-icon>
+                                {{ item.employee.email }}
+                              </v-list-item-subtitle>
+                              <v-list-item-subtitle>
+                                <v-icon small class="mr-1">mdi-phone</v-icon>
+                                {{ item.employee.phone }}
+                              </v-list-item-subtitle>
+                            </v-list-item-content>
+                          </v-list-item>
+                        </v-list>
+                      </v-col>
+                    </v-row>
                   </v-card-text>
                 </v-card>
               </td>
@@ -132,6 +210,15 @@
             <v-toolbar flat>
               <v-toolbar-title>Projects</v-toolbar-title>
               <v-spacer />
+              <v-text-field
+                v-model="searchTerm"
+                label="Search"
+                prepend-inner-icon="mdi-magnify"
+                variant="solo"
+                density="compact"
+                hide-details
+                class="mr-16"
+              ></v-text-field>
 
               <!-- New/Edit dialog -->
               <v-dialog v-model="dialog" max-width="500px">
@@ -181,6 +268,15 @@
                             v-model="editedItem.endDate"
                             label="Contract End Date *"
                           ></v-text-field>
+                        </v-col>
+                        <v-col cols="12" sm="12">
+                          <v-select
+                            v-model="editedItem.priority"
+                            :items="priority"
+                            item-title="name"
+                            item-value="name"
+                            label="Priority *"
+                          ></v-select>
                         </v-col>
                         <v-col cols="12" sm="12">
                           <v-select
@@ -293,19 +389,27 @@
 
 <script setup>
 import { ref, computed, onMounted, watchEffect } from "vue";
+import { grey } from "vuetify/util/colors";
 
 const expanded = ref(false);
 const isLoading = ref(false);
 const dialog = ref(false);
 const dialogDelete = ref(false);
+const customerContactPerson = ref([]);
+const searchTerm = ref("");
 const status = ref([]);
 const customer = ref([]);
-const contactperson = ref([]);
 const service = ref([]);
 const employee = ref([]);
 const projects = ref([]);
 const editedIndex = ref(-1);
 const delay = ref(5000);
+
+const priority = ref([
+  { id: 1, name: "Low" },
+  { id: 2, name: "Medium" },
+  { id: 3, name: "High" },
+]);
 
 const selectedRoleId = ref(1);
 const filteredEmployees = computed(() => {
@@ -316,11 +420,12 @@ const filteredEmployees = computed(() => {
 
 const headers = [
   { title: "ID", key: "id" },
+  { title: "Status", key: "status" },
   { title: "Name", key: "name" },
   { title: "Description", key: "description" },
   { title: "StartDate", key: "startDate" },
   { title: "EndDate", key: "endDate" },
-  { title: "Status", key: "status" },
+  { title: "Priority", key: "priority" },
   { title: "Service", key: "service" },
   { title: "Customer", key: "customers" },
   { title: "Project Manager", key: "employee" },
@@ -333,6 +438,7 @@ const editedItem = ref({
   description: "",
   startDate: null,
   endDate: null,
+  priority: "",
   statusId: null,
   serviceId: null,
   customerId: null,
@@ -345,6 +451,7 @@ const defaultItem = {
   description: "",
   startDate: null,
   endDate: null,
+  priority: "",
   statusId: null,
   serviceId: null,
   customerId: null,
@@ -364,6 +471,16 @@ const statusColorMapping = {
   Archived: "black",
 };
 
+const priorityColorMapping = {
+  Low: "green",
+  Medium: "orange",
+  High: "red",
+};
+
+function getpriorityColor(status) {
+  return priorityColorMapping[status.trim()] || "default";
+}
+
 function getStatusColor(status) {
   return statusColorMapping[status.trim()] || "default";
 }
@@ -374,20 +491,26 @@ const formTitle = computed(() => {
 
 async function fetchProjects() {
   try {
-    const response = await fetch(`http://192.168.1.6:5000/api/projects`);
+    const response = await fetch(
+      `http://192.168.1.6:5000/api/projects?search=${searchTerm.value}`
+    );
     if (!response.ok) throw new Error("Failed to fetch projects");
 
     const data = await response.json();
     console.log("Fetched projects:", data);
     projects.value = data.map((proj) => {
       const cust = customer.value.find((c) => c.id === proj.customerId);
+      const emp = employee.value.find((e) => e.id === proj.employeeId);
       return {
         ...proj,
-        status: status.value.find((s) => s.id === proj.statusId).status,
-        service: service.value.find((s) => s.id === proj.serviceId).serviceName,
+        status: status.value.find((s) => s.id === proj.statusId)?.status || "",
+        service:
+          service.value.find((s) => s.id === proj.serviceId)?.serviceName || "",
+        serviceCurrency: service.currency || "",
+        serviceUnit: service.unit || "",
         // Keep the entire customer object so we can access nested properties
         customers: cust || {},
-        employee: employee.value.find((e) => e.id === proj.employeeId).fullName,
+        employee: emp || {},
       };
     });
     // Reset delay and hide the snackbar on success
@@ -440,6 +563,7 @@ async function fetchEmployees() {
     employee.value = data.map((emp) => ({
       ...emp,
       fullName: emp.firstName + " " + emp.lastName,
+      email: emp.email,
     }));
   } catch (error) {
     console.error("Error fetching employees:", error);
@@ -525,10 +649,12 @@ async function save() {
   try {
     const payload = {
       id: editedItem.value.id,
+      projectNumber: editedItem.value.projectNumber,
       name: editedItem.value.name,
       description: editedItem.value.description,
       startDate: editedItem.value.startDate,
       endDate: editedItem.value.endDate,
+      priority: editedItem.value.priority,
       statusId: editedItem.value.statusId,
       serviceId: editedItem.value.serviceId,
       customerId: editedItem.value.customerId,
@@ -594,7 +720,7 @@ async function save() {
   }
 }
 
-watchEffect()(() => {
+watchEffect(() => {
   fetchProjects();
 });
 
@@ -611,3 +737,13 @@ defineExpose({
   fetchProjects,
 });
 </script>
+
+<style scoped>
+::v-deep .full-text {
+  white-space: normal;
+  overflow: visible;
+  text-overflow: unset;
+  word-break: break-word;
+  max-width: 60%;
+}
+</style>

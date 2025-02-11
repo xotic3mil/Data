@@ -16,6 +16,7 @@ public class ProjectRegForm
     public string Description { get; set; } = null!;
     public DateOnly StartDate { get; set; }
     public DateOnly EndDate { get; set; }
+    public string Priority { get; set; } = null!;
     public int StatusId { get; set; }
     public int CustomerId { get; set; }
     public int EmployeeId { get; set; }

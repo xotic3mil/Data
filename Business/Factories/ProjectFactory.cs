@@ -19,6 +19,7 @@ namespace Business.Factories
             Description = form.Description,
             StartDate = form.StartDate,
             EndDate = form.EndDate,
+            Priority = form.Priority,
             ServiceId = form.ServiceId,
             CustomerId = form.CustomerId,
             EmployeeId = form.EmployeeId,
@@ -28,10 +29,12 @@ namespace Business.Factories
         public static Projects Create(ProjectEntity entity) => new()
         {
             Id = entity.Id,
+            ProjectNumber = entity.ProjectNumber,
             Name = entity.Name,
             Description = entity.Description,
             StartDate = entity.StartDate,
             EndDate = entity.EndDate,
+            Priority = entity.Priority,
             ServiceId = entity.ServiceId,
             Service = entity.Service != null ? ServiceFactory.Create(entity.Service) : null,
             Customers = entity.Customer != null ? CustomerFactory.Create(entity.Customer) : null,
@@ -45,10 +48,12 @@ namespace Business.Factories
         public static ProjectEntity Create(Projects projects) => new()
         {
             Id = projects.Id,
+            ProjectNumber = projects.ProjectNumber,
             Name = projects.Name,
             Description = projects.Description,
             StartDate = projects.StartDate,
             EndDate = projects.EndDate,
+            Priority = projects.Priority,
             ServiceId = projects.ServiceId,
             CustomerId = projects.CustomerId,
             EmployeeId = projects.EmployeeId,
