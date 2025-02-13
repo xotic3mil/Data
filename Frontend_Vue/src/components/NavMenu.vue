@@ -1,30 +1,21 @@
 <template>
   <v-app-bar color="biru" dark>
     <v-app-bar-nav-icon
-      variant="text"
+      variant="tonal"
       @click.stop="drawer = !drawer"
     ></v-app-bar-nav-icon>
 
     <v-toolbar-title>ProcrastiPlan</v-toolbar-title>
-
-    <v-spacer></v-spacer>
-
-    <template v-if="$vuetify.display.mdAndUp">
-      <v-btn icon="mdi-magnify" variant="text"></v-btn>
-
-      <v-btn icon="mdi-filter" variant="text"></v-btn>
-    </template>
-
-    <v-btn icon="mdi-dots-vertical" variant="text"></v-btn>
   </v-app-bar>
 
   <v-navigation-drawer
     v-model="drawer"
     :location="$vuetify.display.mobile ? 'bottom' : undefined"
     temporary
-    :width="230"
+    :width="250"
   >
     <v-list-item
+      class="mt-3"
       prepend-icon="mdi-view-dashboard"
       link
       title="Dashboard"

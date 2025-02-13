@@ -394,8 +394,4 @@ onMounted(async () => {
   await fetchRoles();
   await fetchEmployees();
 });
-
-defineExpose({
-  fetchEmployees,
-});
 </script>
