@@ -1,16 +1,15 @@
+//// filepath: /d:/Github/Data/Frontend_Vue/src/pages/Roles.vue
 <script setup>
-import { ref, onMounted } from "vue";
+import { ref } from "vue";
 import CrudComponent from "@/components/CrudComponent.vue";
+import { createRole, updateRole, deleteRole } from "@/services/apiService.js";
+import { useRoles } from "@/composables/useRoles.js";
 
-const api = "http://192.168.1.6:5000/api/roles";
-
-// Define the form fields to be used by CrudComponent.
-// Note: "id" is created as read-only (disabled) and "roles" is your role name field.
 const formFields = [{ label: "Role", key: "roleName", type: "text" }];
 const headers = [
   { text: "Id", value: "id" },
   { text: "Role", value: "roleName" },
-  { text: "Actions", value: "actions", sortable: false },
+  { text: "Manage", value: "actions", sortable: false },
 ];
 
 const snackbar = ref({
@@ -19,28 +18,13 @@ const snackbar = ref({
   color: "error",
 });
 
+const { roles, loading, error, loadRoles } = useRoles();
 
-
-// The save and deleteItemConfirm functions remain the same.
 async function save(item) {
   try {
-    let response;
     if (item.id) {
       // Update existing role
-      response = await fetch(api, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(item),
-      });
-      if (response.status === 409) {
-        snackbar.value = {
-          show: true,
-          message: "Role already exists",
-          color: "error",
-        };
-        return;
-      }
-      if (!response.ok) throw new Error("Update failed");
+      await updateRole(item);
       snackbar.value = {
         show: true,
         message: "Role updated successfully!",
@@ -48,61 +32,75 @@ async function save(item) {
       };
     } else {
       // Create new role
-      response = await fetch(api, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(item),
-      });
-      if (response.status === 409) {
-        snackbar.value = {
-          show: true,
-          message: "Role already exists",
-          color: "error",
-        };
-        return;
-      }
-      if (!response.ok) throw new Error("Creation failed");
+      await createRole(item);
       snackbar.value = {
         show: true,
         message: "Role created successfully!",
         color: "success",
       };
     }
-  } catch (error) {
-    console.error("Error:", error);
+    // Reload roles after a change
+    loadRoles();
+  } catch (err) {
+    if (err.message === "Role already exists") {
+      snackbar.value = {
+        show: true,
+        message: "Role already exists",
+        color: "error",
+      };
+      return;
+    }
+    console.error("Error:", err);
   }
 }
 
 async function deleteItemConfirm(id) {
   try {
-    const response = await fetch(`${api}/${id}`, {
-      method: "DELETE",
-    });
-    if (!response.ok) throw new Error("Delete failed");
+    await deleteRole(id);
     snackbar.value = {
       show: true,
       message: "Role deleted successfully!",
       color: "success",
     };
-  } catch (error) {
-    console.error("Error:", error);
+    // Reload roles after deletion
+    loadRoles();
+  } catch (err) {
+    console.error("Error:", err);
   }
 }
 </script>
 
 <template>
-  <div>
-    <CrudComponent
-      max-width="800px"
-      :api="api"
-      title="Roles"
-      :formFields="formFields"
-      :headers="headers"
-      :save="save"
-      :deleteItemConfirm="deleteItemConfirm"
-      :snackbar="snackbar"
-      @edit-item=""
-      @delete-item=""
-    />
+  <div
+    v-motion
+    :initial="{ opacity: 0, y: 100 }"
+    :enter="{
+      opacity: 1,
+      y: 0,
+      transition: {
+        type: 'spring',
+        stiffness: '100',
+        damping: '20',
+        mass: 0.5,
+        delay: 200,
+      },
+    }"
+  >
+    <div>
+      <CrudComponent
+        max-width="800px"
+        title="Roles"
+        :items="roles"
+        :formFields="formFields"
+        :headers="headers"
+        :loading="loading"
+        :save="save"
+        :deleteItemConfirm="deleteItemConfirm"
+        :snackbar="snackbar"
+        @edit-item=""
+        @delete-item=""
+      />
+      <div v-if="error" class="error">Error: {{ error.message }}</div>
+    </div>
   </div>
 </template>

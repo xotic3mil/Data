@@ -20,7 +20,18 @@ public class EmployeeService(IEmployeeRepository employeeRepository) : IEmployee
         }
 
         employeeEntity = EmployeeFactory.Create(form);
-        employeeEntity = await _employeeRepository.CreateAsync(employeeEntity);
+        try 
+        {
+            await _employeeRepository.BeginTransactionAsync();
+            employeeEntity = await _employeeRepository.CreateAsync(employeeEntity);
+            await _employeeRepository.CommitTransactionAsync();
+
+        }
+        catch (Exception ex)
+        {
+            await _employeeRepository.RollbackTransactionAsync();
+            return null!;
+        }
         return EmployeeFactory.Create(employeeEntity);
     }
 
@@ -59,14 +70,37 @@ public class EmployeeService(IEmployeeRepository employeeRepository) : IEmployee
     {
 
         var employeeEntity = EmployeeFactory.Create(employee, employee.Id);
-        employeeEntity = await _employeeRepository.UpdateAsync(x => x.Id == employee.Id, employeeEntity);
+        try 
+        {
+            await _employeeRepository.BeginTransactionAsync();
+            employeeEntity = await _employeeRepository.UpdateAsync(x => x.Id == employee.Id, employeeEntity);
+            await _employeeRepository.CommitTransactionAsync();
+        }
+        catch (Exception ex)
+        {
+            await _employeeRepository.RollbackTransactionAsync();
+            return null!;
+        }
         return EmployeeFactory.Create(employeeEntity);
     }
 
     public async Task<bool> DeleteEmployee(int id)
     {
-        var result = await _employeeRepository.DeleteAsync(x => x.Id == id);
-        return result;
+        try 
+        {
+            await _employeeRepository.BeginTransactionAsync();
+            var result = await _employeeRepository.DeleteAsync(x => x.Id == id);
+            await _employeeRepository.CommitTransactionAsync();
+            return result;
+
+        }
+        catch (Exception ex)
+        {
+            await _employeeRepository.RollbackTransactionAsync();
+            return false;
+        }
+        
+       
     }
 
 

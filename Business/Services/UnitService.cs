@@ -26,14 +26,36 @@ namespace Business.Services
             }
 
             UnitEntity = UnitFactory.Create(form);
-            UnitEntity = await _unitRepository.CreateAsync(UnitEntity);
-            return UnitFactory.Create(UnitEntity);
+            try 
+            {
+                await _unitRepository.BeginTransactionAsync();
+                UnitEntity = await _unitRepository.CreateAsync(UnitEntity);
+                await _unitRepository.CommitTransactionAsync();
+            }
+            catch (Exception ex)
+            {
+                await _unitRepository.RollbackTransactionAsync();
+                return null!;
+            }
+                return UnitFactory.Create(UnitEntity);
         }
 
         public async Task<bool> DeleteUnit(int id)
         {
-            var result = await _unitRepository.DeleteAsync(x => x.Id == id);
-            return result;
+
+            try 
+            {
+                await _unitRepository.BeginTransactionAsync();
+                var result = await _unitRepository.DeleteAsync(x => x.Id == id);
+                await _unitRepository.CommitTransactionAsync();
+                return result;
+            }
+            catch (Exception ex)
+            {
+                await _unitRepository.RollbackTransactionAsync();
+                return false;
+            }
+   
         }
 
         public async Task<Units> GetUnitId(int id)
@@ -51,7 +73,17 @@ namespace Business.Services
         public async Task<Units> UpdateUnit(Units units)
         {
             var UnitEntity = UnitFactory.Create(units);
-            UnitEntity = await _unitRepository.UpdateAsync(x => x.Id == units.Id, UnitEntity);
+            try 
+            {
+                await _unitRepository.BeginTransactionAsync();
+                UnitEntity = await _unitRepository.UpdateAsync(x => x.Id == units.Id, UnitEntity);
+                await _unitRepository.CommitTransactionAsync();
+            }
+            catch (Exception ex)
+            {
+                await _unitRepository.RollbackTransactionAsync();
+                return null!;
+            }
             return UnitFactory.Create(UnitEntity);
         }
     }

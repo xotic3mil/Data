@@ -21,15 +21,38 @@ public class StatusTypeService(IStatusTypeRepository statusTypeRepository) : ISt
         }
 
         statusTypeEntity = StatusTypeFactory.Create(form);
-        statusTypeEntity = await _statusTypeRepository.CreateAsync(statusTypeEntity);
-        return StatusTypeFactory.Create(statusTypeEntity);
+        try 
+        {
+            await _statusTypeRepository.BeginTransactionAsync();
+            statusTypeEntity = await _statusTypeRepository.CreateAsync(statusTypeEntity);
+            await _statusTypeRepository.CommitTransactionAsync();
 
+        }
+        catch (Exception ex)
+        {
+            await _statusTypeRepository.RollbackTransactionAsync();
+            return null!;
+        }
+        return StatusTypeFactory.Create(statusTypeEntity);
     }
 
     public async Task<bool> DeleteStatus(int id)
     {
-        var result = await _statusTypeRepository.DeleteAsync(x => x.Id == id);
-        return result;
+
+        try 
+        {
+            await _statusTypeRepository.BeginTransactionAsync();
+            var result = await _statusTypeRepository.DeleteAsync(x => x.Id == id);
+            await _statusTypeRepository.CommitTransactionAsync();
+            return result;
+
+        }
+
+        catch (Exception ex)
+        {
+            await _statusTypeRepository.RollbackTransactionAsync();
+            return false;
+        }
     }
 
     public async Task<IEnumerable<StatusTypes>> GetStatus(string? search)
@@ -47,7 +70,17 @@ public class StatusTypeService(IStatusTypeRepository statusTypeRepository) : ISt
     public async Task<StatusTypes> UpdateStatus(StatusTypes status)
     {
         var statusEntity = StatusTypeFactory.Create(status);
-        statusEntity = await _statusTypeRepository.UpdateAsync(x => x.Id == status.Id, statusEntity);
+        try 
+        {
+            await _statusTypeRepository.BeginTransactionAsync();
+            statusEntity = await _statusTypeRepository.UpdateAsync(x => x.Id == status.Id, statusEntity);
+            await _statusTypeRepository.CommitTransactionAsync();
+        }
+        catch (Exception ex)
+        {
+            await _statusTypeRepository.RollbackTransactionAsync();
+            return null!;
+        }
         return StatusTypeFactory.Create(statusEntity);
     }
 }

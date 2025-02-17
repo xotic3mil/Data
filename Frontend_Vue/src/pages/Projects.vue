@@ -319,9 +319,7 @@
                                       append-inner-icon="mdi-currency-usd"
                                       variant="solo-filled"
                                       v-model="newService.price"
-                                      :items="customerContactPerson"
                                       item-value="id"
-                                      item-title="fullName"
                                       label="Price *"
                                       required
                                     ></v-text-field>
@@ -704,7 +702,7 @@ import {
   fetchCurrencies,
   fetchUnits,
   fetchCustomers,
-} from "@/services/projectService";
+} from "@/services/apiService";
 
 const expanded = ref(false);
 const isLoading = ref(true);
@@ -749,7 +747,7 @@ const headers = [
   { title: "Service", key: "service" },
   { title: "Customer", key: "customers" },
   { title: "Project Manager", key: "employee" },
-  { title: "Actions", key: "actions", sortable: false },
+  { title: "Manage", key: "actions", sortable: false },
 ];
 
 const newCustomerContact = ref({

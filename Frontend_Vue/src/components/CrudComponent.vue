@@ -3,7 +3,6 @@
 import { ref, defineProps, defineEmits } from "vue";
 
 const props = defineProps({
-  api: { type: String, required: true },
   items: { type: Array, default: () => [] },
   title: { type: String, default: "CRUD" },
   formFields: { type: Array, default: () => [] },
@@ -14,14 +13,7 @@ const props = defineProps({
 const emits = defineEmits(["refresh"]);
 
 const isLoading = ref(false);
-const fetchDelay = ref(5000);
 const internalItems = ref([]);
-
-const snackbar = ref({
-  show: false,
-  message: "",
-  color: "error",
-});
 
 // Existing dialog/edit state
 const internalDialog = ref(false);
@@ -96,9 +88,11 @@ function closeDeleteDialog() {
     <template v-else>
       <v-data-table
         :headers="props.headers"
+        v-model:expanded="expanded"
         :items="props.items"
         item-value="id"
         class="elevation-1"
+        show-expand
       >
         <template v-slot:top>
           <v-toolbar flat>

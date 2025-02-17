@@ -26,14 +26,34 @@ namespace Business.Services
             }
 
             customerContactPersonEntity = CustomerContactPersonFactory.Create(form);
-            customerContactPersonEntity = await _customerContactPersonRepository.CreateAsync(customerContactPersonEntity);
+            try 
+            {
+                await _customerContactPersonRepository.BeginTransactionAsync();
+                customerContactPersonEntity = await _customerContactPersonRepository.CreateAsync(customerContactPersonEntity);
+                await _customerContactPersonRepository.CommitTransactionAsync();
+            }
+            catch (Exception ex)
+            {
+                await _customerContactPersonRepository.RollbackTransactionAsync();
+                return null!;
+            }
             return CustomerContactPersonFactory.Create(customerContactPersonEntity);
         }
 
         public async Task<bool> DeleteCustomerContactPerson(int id)
         {
-            var result = await _customerContactPersonRepository.DeleteAsync(x => x.Id == id);
-            return result;
+            try 
+            {
+                await _customerContactPersonRepository.BeginTransactionAsync();
+                var result = await _customerContactPersonRepository.DeleteAsync(x => x.Id == id);
+                await _customerContactPersonRepository.CommitTransactionAsync();
+                return result;
+            }
+            catch (Exception ex)
+            {
+                await _customerContactPersonRepository.RollbackTransactionAsync();
+                return false;
+            }
         }
 
         public async Task<IEnumerable<CustomerContactPerson>> GetCustomerContactPerson(string? search)
@@ -57,7 +77,18 @@ namespace Business.Services
         public async Task<CustomerContactPerson> UpdateCustomerContactPerson(CustomerContactPerson customerContactPerson)
         {
             var customerContactPersonEntity = CustomerContactPersonFactory.Create(customerContactPerson);
-            customerContactPersonEntity = await _customerContactPersonRepository.UpdateAsync(x => x.Id == customerContactPerson.Id, customerContactPersonEntity);
+
+            try 
+            {
+                await _customerContactPersonRepository.BeginTransactionAsync();
+                customerContactPersonEntity = await _customerContactPersonRepository.UpdateAsync(x => x.Id == customerContactPerson.Id, customerContactPersonEntity);
+                await _customerContactPersonRepository.CommitTransactionAsync();
+            }
+            catch (Exception ex)
+            {
+                await _customerContactPersonRepository.RollbackTransactionAsync();
+                return null!;
+            }
             return CustomerContactPersonFactory.Create(customerContactPersonEntity);
         }
     }

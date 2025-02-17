@@ -21,7 +21,17 @@ public class ProjectService(IProjectRespository projectRespository) : IProjectsS
         }
 
         projectEntity = ProjectFactory.Create(form);
-        projectEntity = await _projectRespository.CreateAsync(projectEntity);
+        try 
+        {
+            await _projectRespository.BeginTransactionAsync();
+            projectEntity = await _projectRespository.CreateAsync(projectEntity);
+            await _projectRespository.CommitTransactionAsync();
+        }
+        catch (Exception ex)
+        {
+            await _projectRespository.RollbackTransactionAsync();
+            return null!;
+        }
         return ProjectFactory.Create(projectEntity);
     }
 
@@ -47,24 +57,44 @@ public class ProjectService(IProjectRespository projectRespository) : IProjectsS
 
             return filteredProjects.Select(ProjectFactory.Create);
         }
-
-
         return projects.Select(ProjectFactory.Create);
-
     }
 
     public async Task<Projects> UpdateProject(Projects projects)
     {
 
         var projectEntity = ProjectFactory.Create(projects);
-        projectEntity = await _projectRespository.UpdateAsync(x => x.Id == projects.Id, projectEntity);
+        try 
+        {
+            await _projectRespository.BeginTransactionAsync();
+            projectEntity = await _projectRespository.UpdateAsync(x => x.Id == projects.Id, projectEntity);
+            await _projectRespository.CommitTransactionAsync();
+        }
+        catch (Exception ex)
+        {
+            await _projectRespository.RollbackTransactionAsync();
+            return null!;
+        }
+       
         return ProjectFactory.Create(projectEntity);
     }
 
     public async Task<bool> DeleteProject(int id)
     {
-        var result = await _projectRespository.DeleteAsync(x => x.Id == id);
-        return result;
+
+        try 
+        {
+            await _projectRespository.BeginTransactionAsync();
+            var result = await _projectRespository.DeleteAsync(x => x.Id == id);
+            await _projectRespository.CommitTransactionAsync();
+            return result;
+        }
+        catch (Exception ex)
+        {
+            await _projectRespository.RollbackTransactionAsync();
+            return false;
+        }
+
     }
 
 

@@ -21,14 +21,40 @@ public class ServicesService(IServiceRepository serviceRepository) : IServicesSe
         }
 
         serviceEntity = ServiceFactory.Create(form);
-        serviceEntity = await _serviceRepository.CreateAsync(serviceEntity);
-        return ServiceFactory.Create(serviceEntity);
+        try 
+        {
+            await _serviceRepository.BeginTransactionAsync();
+            serviceEntity = await _serviceRepository.CreateAsync(serviceEntity);
+            await _serviceRepository.CommitTransactionAsync();
+
+        }
+        catch (Exception ex)
+        {
+            await _serviceRepository.RollbackTransactionAsync();
+            return null!;
+        }
+            return ServiceFactory.Create(serviceEntity);
     }
 
     public async Task<bool> DeleteService(int id)
     {
-        var result = await _serviceRepository.DeleteAsync(x => x.Id == id);
-        return result;
+
+        try
+        {
+            await _serviceRepository.BeginTransactionAsync();
+            var result = await _serviceRepository.DeleteAsync(x => x.Id == id);
+            await _serviceRepository.CommitTransactionAsync();
+            return result;
+
+        }
+
+        catch (Exception ex) 
+        {
+            await _serviceRepository.RollbackTransactionAsync();
+            return false;
+        }
+        
+       
     }
 
     public async Task<Service> GetServiceId(int id)
@@ -46,7 +72,18 @@ public class ServicesService(IServiceRepository serviceRepository) : IServicesSe
     public async Task<Service> UpdateService(Service service)
     {
         var serviceEntity = ServiceFactory.Create(service, service.Id);
-        serviceEntity = await _serviceRepository.UpdateAsync(x => x.Id == service.Id, serviceEntity);
+
+        try 
+        {
+            await _serviceRepository.BeginTransactionAsync();
+            serviceEntity = await _serviceRepository.UpdateAsync(x => x.Id == service.Id, serviceEntity);
+            await _serviceRepository.CommitTransactionAsync();
+        }
+        catch (Exception ex)
+        {
+            await _serviceRepository.RollbackTransactionAsync();
+            return null!;
+        }
         return ServiceFactory.Create(serviceEntity);
     }
 }

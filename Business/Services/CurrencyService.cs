@@ -26,15 +26,37 @@ namespace Business.Services
             }
 
             currencyEntity = CurrencyFactory.Create(form);
-            currencyEntity = await _currencyRepository.CreateAsync(currencyEntity);
+
+            try 
+            {
+                await _currencyRepository.BeginTransactionAsync();
+                currencyEntity = await _currencyRepository.CreateAsync(currencyEntity);
+                await _currencyRepository.CommitTransactionAsync();
+            }
+            catch (Exception ex)
+            {
+                await _currencyRepository.RollbackTransactionAsync();
+                return null!;
+            }
+            
             return CurrencyFactory.Create(currencyEntity);
 
         }
 
         public async Task<bool> DeleteCurrency(int id)
         {
-            var result = await _currencyRepository.DeleteAsync(x => x.Id == id);
-            return result;
+            try 
+            {
+                await _currencyRepository.BeginTransactionAsync();
+                var result = await _currencyRepository.DeleteAsync(x => x.Id == id);
+                await _currencyRepository.CommitTransactionAsync();
+                return result;
+            }
+            catch (Exception ex)
+            {
+                await _currencyRepository.RollbackTransactionAsync();
+                return false;
+            }
         }
 
         public async Task<IEnumerable<Currencies>> GetCurrencies(string? search)
@@ -57,7 +79,18 @@ namespace Business.Services
         public async Task<Currencies> UpdateCurrency(Currencies currencies)
         {
             var currencyEntity = CurrencyFactory.Create(currencies);
-            currencyEntity = await _currencyRepository.UpdateAsync(x => x.Id == currencies.Id, currencyEntity);
+            try 
+            {
+                await _currencyRepository.BeginTransactionAsync();
+                currencyEntity = await _currencyRepository.UpdateAsync(x => x.Id == currencies.Id, currencyEntity);
+                await _currencyRepository.CommitTransactionAsync();
+            }
+            catch (Exception ex)
+            {
+                await _currencyRepository.RollbackTransactionAsync();
+                return null!;
+            }
+            
             return CurrencyFactory.Create(currencyEntity);
         }
     }

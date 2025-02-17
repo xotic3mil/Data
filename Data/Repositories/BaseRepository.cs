@@ -2,6 +2,7 @@
 using Data.Entities;
 using Data.Interfaces;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Storage;
 using System.Diagnostics;
 using System.Linq.Expressions;
 
@@ -11,6 +12,37 @@ public abstract class BaseRepository<TEntity>(AppDbContext context) : IBaseRepos
 {
     private readonly AppDbContext _context = context;
     private readonly DbSet<TEntity> _dbSet = context.Set<TEntity>();
+    private IDbContextTransaction _transaction = null!;
+
+    #region Transaction Management
+
+    public virtual async Task BeginTransactionAsync()
+    {
+        _transaction ??= await _context.Database.BeginTransactionAsync();
+    }
+
+
+    public virtual async Task CommitTransactionAsync()
+    {
+        if (_transaction != null)
+        {
+            await _transaction.CommitAsync();
+            await _transaction.DisposeAsync();
+            _transaction = null!;
+        }
+    }
+
+    public virtual async Task RollbackTransactionAsync()
+    {
+        if (_transaction != null)
+        {
+            await _transaction.RollbackAsync();
+            await _transaction.DisposeAsync();
+            _transaction = null!;
+        }
+    }
+
+    #endregion
 
 
     public virtual async Task<TEntity> CreateAsync(TEntity entity)

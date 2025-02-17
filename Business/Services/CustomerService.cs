@@ -26,7 +26,18 @@ namespace Business.Services
             }
 
             customerEntity = CustomerFactory.Create(form);
-            customerEntity = await _customerRepository.CreateAsync(customerEntity);
+            try
+            {
+                await _customerRepository.BeginTransactionAsync();
+                customerEntity = await _customerRepository.CreateAsync(customerEntity);
+                await _customerRepository.CommitTransactionAsync();
+            }
+            catch (Exception ex)
+            {
+                await _customerRepository.RollbackTransactionAsync();
+                return null!;
+            }
+
             return CustomerFactory.Create(customerEntity);
         }
 
@@ -50,14 +61,40 @@ namespace Business.Services
         {
 
             var customerEntity = CustomerFactory.Create(customers);
-            customerEntity = await _customerRepository.UpdateAsync(x => x.Id == customers.Id, customerEntity);
+
+            try
+            {
+                await _customerRepository.BeginTransactionAsync();
+                customerEntity = await _customerRepository.UpdateAsync(x => x.Id == customers.Id, customerEntity);
+                await _customerRepository.CommitTransactionAsync();
+
+            }
+            catch (Exception ex)
+            {
+                await _customerRepository.RollbackTransactionAsync();
+                return null!;
+            }
+
             return CustomerFactory.Create(customerEntity);
         }
 
         public async Task<bool> DeleteCustomer(int id)
         {
-            var result = await _customerRepository.DeleteAsync(x => x.Id == id);
-            return result;
+
+            try 
+            {
+                await _customerRepository.BeginTransactionAsync();
+                var result = await _customerRepository.DeleteAsync(x => x.Id == id);
+                await _customerRepository.CommitTransactionAsync();
+                return result;
+            }
+            catch (Exception ex)
+            {
+                await _customerRepository.RollbackTransactionAsync();
+                return false;
+
+            }
+           
         }
 
     }

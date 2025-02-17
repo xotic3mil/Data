@@ -22,21 +22,53 @@ namespace Business.Services
             }
 
             roleEntity = RoleFactory.Create(form);
-            roleEntity = await _roleRepository.CreateAsync(roleEntity);
+
+            try 
+            {
+                await _roleRepository.BeginTransactionAsync();
+                roleEntity = await _roleRepository.CreateAsync(roleEntity);
+                await _roleRepository.CommitTransactionAsync();
+            }
+            catch (Exception ex)
+            {
+                await _roleRepository.RollbackTransactionAsync();
+                return null!;
+            }
             return RoleFactory.Create(roleEntity);
         }
 
         public async Task<Roles> UpdateRole(Roles role)
         {
             var roleEntity = RoleFactory.Create(role);
-            roleEntity = await _roleRepository.UpdateAsync(x => x.Id == role.Id, roleEntity );
+
+            try 
+            {
+                await _roleRepository.BeginTransactionAsync();
+                roleEntity = await _roleRepository.UpdateAsync(x => x.Id == role.Id, roleEntity);
+                await _roleRepository.CommitTransactionAsync();
+            }
+            catch (Exception ex)
+            {
+                await _roleRepository.RollbackTransactionAsync();
+                return null!;
+            }
             return RoleFactory.Create(roleEntity);
         }
 
         public async Task<bool> DeleteRole(int id)
         {
-            var result = await _roleRepository.DeleteAsync(x => x.Id == id);
-            return result;
+            try 
+            {
+                await _roleRepository.BeginTransactionAsync();
+                var result = await _roleRepository.DeleteAsync(x => x.Id == id);
+                await _roleRepository.CommitTransactionAsync();
+                return result;
+            }
+            catch (Exception ex)
+            {
+                await _roleRepository.RollbackTransactionAsync();
+                return false;
+            }
         }
 
         public async Task<Roles> GetRoleById(int id)

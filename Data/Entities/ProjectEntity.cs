@@ -15,9 +15,9 @@ public class ProjectEntity
     [Required]
     public string Name { get; set; } = null!;
     [Required]
+    [StringLength(800)]
     public string Description { get; set; } = null!;
-    public DateOnly? CreatedAt { get; set; }
-    public DateOnly? UpdatedAt { get; set; }
+
     [Required]
     public DateOnly StartDate { get; set; }
     [Required]

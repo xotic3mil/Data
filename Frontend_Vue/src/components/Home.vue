@@ -1,17 +1,17 @@
 <template>
   <v-container fluid class="dashboard-container">
-    <v-container class="mt-10">
-      <v-row dense>
+    <v-container>
+      <v-row default>
         <v-col
           v-for="stat in statsList"
           :key="stat.title"
           cols="12"
-          sm="3"
+          sm="6"
           md="3"
         >
           <v-card
             v-motion-pop-visible
-            class="pa-4 stat-card elevation-10 mx-15"
+            class="pa-10 stat-card elevation-10"
             outlined
             :to="stat.route"
           >
@@ -25,48 +25,20 @@
           </v-card>
         </v-col>
       </v-row>
-
-      <v-row class="mt-12">
-        <v-col cols="12">
-          <v-card v-motion-pop-visible outlined class="pa-4 elevation-10">
-            <v-card-title>Data Trends</v-card-title>
-            <v-divider></v-divider>
-            <v-card-text>
-              <v-row>
-                <v-col cols="12" md="6">
-                  <div class="mb-2 font-weight-bold">Employee Growth</div>
-                  <v-sparkline
-                    :model-value="sparklineData.employees"
-                    height="50"
-                    line-width="5"
-                    color="blue-lighten-2"
-                  />
-                </v-col>
-                <v-col cols="12" md="6">
-                  <div class="mb-2 font-weight-bold">Project Trends</div>
-                  <v-sparkline
-                    :model-value="sparklineData.projects"
-                    line-width="5"
-                    color="green-lighten-2"
-                  />
-                </v-col>
-              </v-row>
-            </v-card-text>
-          </v-card>
-        </v-col>
-      </v-row>
     </v-container>
   </v-container>
 </template>
 
 <script setup>
 import { ref, onMounted, computed } from "vue";
+import { fetchStats } from "../services/apiService.js";
 
 const stats = ref({
   employees: 0,
   services: 0,
   projects: 0,
   customers: 0,
+  revenue: 0,
 });
 
 const sparklineData = ref({
@@ -74,7 +46,13 @@ const sparklineData = ref({
   projects: [1, 0, 3, 1, 7, 8, 9],
 });
 
-// Update statsList reactively based on stats values
+const formattedRevenue = computed(() => {
+  return new Intl.NumberFormat("sv-SE", {
+    style: "currency",
+    currency: "SEK",
+  }).format(stats.value.revenue);
+});
+
 const statsList = computed(() => [
   {
     title: "Employees",
@@ -100,61 +78,19 @@ const statsList = computed(() => [
     icon: "mdi-account",
     route: "/customers",
   },
-]);
-
-const selectedDate = ref("2025-02-11");
-
-const events = ref([
   {
-    name: "Project Deadline",
-    start: "2025-02-15",
-    end: "2025-02-15",
-    color: "red",
-  },
-  {
-    name: "Team Meeting",
-    start: "2025-02-20",
-    end: "2025-02-20",
-    color: "blue",
+    title: "Total Monthly Revenue",
+    value: formattedRevenue.value,
+    icon: "mdi-currency-usd",
   },
 ]);
 
-async function fetchStats() {
+onMounted(async () => {
   try {
-    const responseEmployees = await fetch(
-      "http://192.168.1.6:5000/api/employees"
-    );
-    const dataEmployees = await responseEmployees.json();
-    console.log("Employees:", dataEmployees);
-    stats.value.employees = dataEmployees.count || dataEmployees.length || 0;
-
-    const responseServices = await fetch(
-      "http://192.168.1.6:5000/api/services"
-    );
-    const dataServices = await responseServices.json();
-    console.log("Services:", dataServices);
-    stats.value.services = dataServices.count || dataServices.length || 0;
-
-    const responseProjects = await fetch(
-      "http://192.168.1.6:5000/api/projects"
-    );
-    const dataProjects = await responseProjects.json();
-    console.log("Projects:", dataProjects);
-    stats.value.projects = dataProjects.count || dataProjects.length || 0;
-
-    const responseCustomers = await fetch(
-      "http://192.168.1.6:5000/api/customers"
-    );
-    const dataCustomers = await responseCustomers.json();
-    console.log("Customers:", dataCustomers);
-    stats.value.customers = dataCustomers.count || dataCustomers.length || 0;
+    stats.value = await fetchStats();
   } catch (error) {
     console.error("Error fetching stats:", error);
   }
-}
-
-onMounted(() => {
-  fetchStats();
 });
 </script>
 

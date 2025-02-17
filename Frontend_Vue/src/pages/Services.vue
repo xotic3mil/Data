@@ -1,148 +1,259 @@
 <template>
-  <v-container>
-    <v-card flat class="elevation">
-      <v-data-table
-        v-model:selected="selected"
-        :headers="headers"
-        :items="services"
-        :sort-by="[{ key: 'id', order: 'asc' }]"
-        item-value="id"
-      >
-        <template v-slot:top>
-          <v-toolbar flat>
-            <v-spacer />
+  <div
+    v-motion
+    :initial="{
+      opacity: 0,
+      y: 100,
+    }"
+    :enter="{
+      opacity: 1,
+      y: 0,
+      transition: {
+        type: 'spring',
+        stiffness: '100',
+        damping: '20',
+        mass: 0.5,
+        delay: 200,
+      },
+    }"
+  >
+    <v-container>
+      <v-card flat class="elevation">
+        <v-data-table
+          v-model:selected="expanded"
+          :headers="headers"
+          :items="services"
+          :sort-by="[{ key: 'id', order: 'asc' }]"
+          item-value="id"
+          show-expand
+        >
+          <template v-slot:item.serviceDescription="{ item }">
+            {{
+              item.serviceDescription.length > 50
+                ? item.serviceDescription.substring(0, 50) + "..."
+                : item.serviceDescription
+            }}
+          </template>
 
-            <!-- New/Edit dialog -->
-            <v-dialog v-model="dialog" max-width="500px">
-              <template v-slot:activator="{ props }">
-                <v-btn
-                  color="blue-lighten-1"
-                  v-bind="props"
-                  variant="elevated"
-                  class="mr-4"
-                >
-                  New Service
-                </v-btn>
-              </template>
+          <template v-slot:top>
+            <v-toolbar flat>
+              <v-toolbar-title>Services</v-toolbar-title>
+              <v-spacer />
 
-              <v-card>
-                <v-card-title>
-                  <span class="text-h5 d-flex justify-center">{{
-                    formTitle
-                  }}</span>
-                </v-card-title>
-
-                <v-card-text>
-                  <v-container>
-                    <v-row>
-                      <v-col cols="12" sm="6">
-                        <v-text-field
-                          v-model="editedItem.serviceName"
-                          label="Service Name *"
-                        ></v-text-field>
-                      </v-col>
-                      <v-col cols="12" sm="6">
-                        <v-text-field
-                          v-model="editedItem.price"
-                          label="Price *"
-                        ></v-text-field>
-                      </v-col>
-                      <v-col cols="12" sm="6">
-                        <v-select
-                          v-model="editedItem.unitId"
-                          :items="units"
-                          item-value="id"
-                          item-title="unit"
-                          label="Unit *"
-                        ></v-select>
-                      </v-col>
-                      <v-col cols="12" sm="6">
-                        <v-select
-                          v-model="editedItem.currencyId"
-                          :items="currencies"
-                          item-value="id"
-                          item-title="currency"
-                          label="Currency *"
-                        ></v-select>
-                      </v-col>
-                    </v-row>
-                    <small class="text-caption text-medium-emphasis"
-                      >* indicates required field</small
-                    >
-                  </v-container>
-                </v-card-text>
-
-                <v-card-actions>
-                  <v-spacer></v-spacer>
-                  <v-btn color="red-lighten-1" variant="text" @click="close">
-                    Cancel
-                  </v-btn>
-                  <v-btn color="blue-lighten-1" variant="text" @click="save">
-                    Save
-                  </v-btn>
-                </v-card-actions>
-              </v-card>
-            </v-dialog>
-
-            <!-- Delete confirmation dialog -->
-            <v-dialog v-model="dialogDelete" max-width="250px">
-              <v-card>
-                <v-card-title class="text-h5">Delete Item?</v-card-title>
-                <v-card-text>
-                  Are you sure you want to delete this service?
-                </v-card-text>
-                <v-card-actions>
-                  <v-spacer></v-spacer>
-                  <v-btn
-                    color="red-lighten-1"
-                    variant="text"
-                    @click="closeDelete"
-                    >Cancel</v-btn
-                  >
+              <!-- New/Edit dialog -->
+              <v-dialog v-model="dialog" max-width="700px">
+                <template v-slot:activator="{ props }">
                   <v-btn
                     color="blue-lighten-1"
-                    variant="text"
-                    @click="deleteItemConfirm"
-                    >OK</v-btn
+                    v-bind="props"
+                    variant="elevated"
+                    class="mr-4"
                   >
-                  <v-spacer></v-spacer>
-                </v-card-actions>
-              </v-card>
-            </v-dialog>
-          </v-toolbar>
-        </template>
+                    New Service
+                  </v-btn>
+                </template>
 
-        <template v-slot:item.actions="{ item }">
-          <v-icon
-            class="me-2"
-            color="blue-lighten-1"
-            size="small"
-            @click="editItem(item)"
-          >
-            mdi-pencil
-          </v-icon>
-          <v-icon size="small" color="red-lighten-1" @click="deleteItem(item)">
-            mdi-delete
-          </v-icon>
-        </template>
-      </v-data-table>
-    </v-card>
-    <v-snackbar v-model="snackbar.show" :color="snackbar.color" :timeout="2000">
-      {{ snackbar.message }}
+                <v-card>
+                  <v-card-title>
+                    <span class="text-h5 d-flex justify-center">{{
+                      formTitle
+                    }}</span>
+                  </v-card-title>
 
-      <template v-slot:actions>
-        <v-btn variant="text" @click="snackbar.show = false"> Close </v-btn>
-      </template>
-    </v-snackbar>
-  </v-container>
+                  <v-card-text>
+                    <v-container>
+                      <v-row>
+                        <v-col cols="12" sm="12">
+                          <v-text-field
+                            v-model="editedItem.serviceName"
+                            label="Service Name *"
+                          ></v-text-field>
+                        </v-col>
+                        <v-col cols="12" sm="12">
+                          <v-textarea
+                            v-model="editedItem.serviceDescription"
+                            label="Service Description *"
+                          ></v-textarea>
+                        </v-col>
+                        <v-col cols="12" sm="12">
+                          <v-text-field
+                            v-model="editedItem.startupPrice"
+                            label="Start-Up Fee *"
+                          ></v-text-field>
+                        </v-col>
+                        <v-col cols="12" sm="6">
+                          <v-text-field
+                            v-model="editedItem.price"
+                            label="Monthly Cost *"
+                          ></v-text-field>
+                        </v-col>
+                        <v-col cols="12" sm="3">
+                          <v-select
+                            v-model="editedItem.unitId"
+                            :items="units"
+                            item-value="id"
+                            item-title="unit"
+                            label="Unit *"
+                          ></v-select>
+                        </v-col>
+                        <v-col cols="12" sm="3">
+                          <v-select
+                            v-model="editedItem.currencyId"
+                            :items="currencies"
+                            item-value="id"
+                            item-title="currency"
+                            label="Currency *"
+                          ></v-select>
+                        </v-col>
+                      </v-row>
+                      <small class="text-caption text-medium-emphasis"
+                        >* indicates required field</small
+                      >
+                    </v-container>
+                  </v-card-text>
+
+                  <v-card-actions>
+                    <v-spacer></v-spacer>
+                    <v-btn
+                      prepend-icon="mdi-close"
+                      color="red-darken-1"
+                      variant="text"
+                      @click="close"
+                    >
+                      Cancel
+                    </v-btn>
+                    <v-btn
+                      prepend-icon="mdi-check"
+                      color="success"
+                      variant="text"
+                      @click="save"
+                    >
+                      Save
+                    </v-btn>
+                  </v-card-actions>
+                </v-card>
+              </v-dialog>
+
+              <!-- Delete confirmation dialog -->
+              <v-dialog v-model="dialogDelete" max-width="250px">
+                <v-card>
+                  <v-card-title class="text-h5">Delete Item?</v-card-title>
+                  <v-card-text>
+                    Are you sure you want to delete this service?
+                  </v-card-text>
+                  <v-card-actions>
+                    <v-spacer></v-spacer>
+                    <v-btn
+                      color="red-lighten-1"
+                      variant="text"
+                      @click="closeDelete"
+                      >Cancel</v-btn
+                    >
+                    <v-btn
+                      color="blue-lighten-1"
+                      variant="text"
+                      @click="deleteItemConfirm"
+                      >OK</v-btn
+                    >
+                    <v-spacer></v-spacer>
+                  </v-card-actions>
+                </v-card>
+              </v-dialog>
+            </v-toolbar>
+          </template>
+
+          <template v-slot:expanded-row="{ columns, item }">
+            <tr>
+              <td :colspan="columns.length" class="pa-10">
+                <v-card outlined class="elevation-5 rounded-lg">
+                  <v-card-title>
+                    <div
+                      class="d-flex justify-space-between align-center"
+                      style="width: 100%"
+                    >
+                      <span class="headline">{{ item.serviceName }}</span>
+                    </div>
+                  </v-card-title>
+
+                  <v-divider></v-divider>
+
+                  <v-card-text>
+                    <v-container>
+                      <!-- Project Details Section -->
+                      <v-row>
+                        <v-col cols="12" md="12">
+                          <v-list>
+                            <v-list-item>
+                              <v-list-item-action> </v-list-item-action>
+                            </v-list-item>
+                            <v-list-item>
+                              <v-list-item-title class="font-weight-bold"
+                                >Description
+                              </v-list-item-title>
+                              <div
+                                class="full-text"
+                                v-html="
+                                  renderDescription(item.serviceDescription)
+                                "
+                              ></div>
+                            </v-list-item>
+                          </v-list>
+                        </v-col>
+
+                        <v-col cols="12" md="6">
+                          <v-list two-line> </v-list>
+                        </v-col>
+                      </v-row>
+
+                      <v-divider></v-divider>
+                    </v-container>
+                  </v-card-text>
+                </v-card>
+              </td>
+            </tr>
+          </template>
+
+          <template v-slot:item.actions="{ item }">
+            <v-btn
+              class="me-2"
+              color="blue-darken-1"
+              size="x-small"
+              @click="editItem(item)"
+            >
+              Edit
+            </v-btn>
+            <v-btn
+              size="x-small"
+              color="red-darken-1"
+              @click="deleteItem(item)"
+            >
+              Delete
+            </v-btn>
+          </template>
+        </v-data-table>
+      </v-card>
+      <v-snackbar
+        v-model="snackbar.show"
+        :color="snackbar.color"
+        :timeout="2000"
+      >
+        {{ snackbar.message }}
+
+        <template v-slot:actions>
+          <v-btn variant="text" @click="snackbar.show = false"> Close </v-btn>
+        </template>
+      </v-snackbar>
+    </v-container>
+  </div>
 </template>
 
 <script setup>
 import { ref, computed, onMounted, watchEffect } from "vue";
+import { renderDescription } from "@/services/markdownService.js";
 
+const expanded = ref(false);
 const dialog = ref(false);
 const dialogDelete = ref(false);
-const selected = ref([]);
 const services = ref([]);
 const units = ref([]);
 const currencies = ref([]);
@@ -151,22 +262,27 @@ const editedIndex = ref(-1);
 const headers = [
   { title: "ID", key: "id" },
   { title: "Service Name", key: "serviceName" },
+  { title: "Description", key: "serviceDescription" },
+  { title: "Start Up Fee", key: "formattedStartupPrice" },
+  { title: "Price", key: "formattedPrice" },
   { title: "Unit", key: "unit" },
   { title: "Currency", key: "currency" },
-  { title: "Price", key: "price" },
-  { title: "Actions", key: "actions", sortable: false },
+  { title: "Manage", key: "actions", sortable: false },
 ];
 
 const editedItem = ref({
   id: null,
   serviceName: "",
+  serviceDescription: "",
   price: "",
   unitId: null,
   currencyId: null,
 });
+
 const defaultItem = {
   id: null,
   serviceName: "",
+  serviceDescription: "",
   price: "",
   unitId: null,
   currencyId: null,
@@ -189,8 +305,20 @@ async function fetchServices() {
       );
       return {
         ...service,
-        unit: unitObj ? unitObj.unit : "", // e.g. "SEK"
-        currency: currencyObj ? currencyObj.currency : "", // e.g. "JPY"
+        unit: unitObj ? unitObj.unit : "",
+        currency: currencyObj ? currencyObj.currency : "",
+        formattedPrice: new Intl.NumberFormat("sv-SE", {
+          style: "currency",
+          currency: "SEK",
+          minimumFractionDigits: 2,
+          maximumFractionDigits: 2,
+        }).format(service.price),
+        formattedStartupPrice: new Intl.NumberFormat("sv-SE", {
+          style: "currency",
+          currency: "SEK",
+          minimumFractionDigits: 2,
+          maximumFractionDigits: 2,
+        }).format(service.startupPrice),
       };
     });
   } catch (error) {

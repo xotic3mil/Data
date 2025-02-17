@@ -1,5 +1,5 @@
 <template>
-  <v-footer class="d-flex"> 2025 — Vuetify, LLC </v-footer>
+  <v-footer class="d-flex justify-end"> 2025 — Procrastiplan, LLC </v-footer>
 </template>
 
 <script></script>

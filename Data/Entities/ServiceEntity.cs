@@ -11,6 +11,14 @@ public class ServiceEntity
     public int Id { get; set; }
     [Required]
     public string ServiceName { get; set; } = null!;
+
+    [Required]
+    [StringLength(800)]
+    public string ServiceDescription { get; set; } = null!;
+
+    [Required]
+    public decimal StartupPrice { get; set; }
+
     [Required]
     public decimal Price { get; set; }
 
