@@ -27,6 +27,7 @@ namespace Business.Services
             {
                 await _roleRepository.BeginTransactionAsync();
                 roleEntity = await _roleRepository.CreateAsync(roleEntity);
+                await _roleRepository.SaveChangesAsync();
                 await _roleRepository.CommitTransactionAsync();
             }
             catch (Exception ex)
@@ -45,6 +46,7 @@ namespace Business.Services
             {
                 await _roleRepository.BeginTransactionAsync();
                 roleEntity = await _roleRepository.UpdateAsync(x => x.Id == role.Id, roleEntity);
+                await _roleRepository.SaveChangesAsync();
                 await _roleRepository.CommitTransactionAsync();
             }
             catch (Exception ex)
@@ -61,6 +63,7 @@ namespace Business.Services
             {
                 await _roleRepository.BeginTransactionAsync();
                 var result = await _roleRepository.DeleteAsync(x => x.Id == id);
+                await _roleRepository.SaveChangesAsync();
                 await _roleRepository.CommitTransactionAsync();
                 return result;
             }

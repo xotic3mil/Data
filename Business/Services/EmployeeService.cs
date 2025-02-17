@@ -24,6 +24,7 @@ public class EmployeeService(IEmployeeRepository employeeRepository) : IEmployee
         {
             await _employeeRepository.BeginTransactionAsync();
             employeeEntity = await _employeeRepository.CreateAsync(employeeEntity);
+            await _employeeRepository.SaveChangesAsync();
             await _employeeRepository.CommitTransactionAsync();
 
         }
@@ -74,6 +75,7 @@ public class EmployeeService(IEmployeeRepository employeeRepository) : IEmployee
         {
             await _employeeRepository.BeginTransactionAsync();
             employeeEntity = await _employeeRepository.UpdateAsync(x => x.Id == employee.Id, employeeEntity);
+            await _employeeRepository.SaveChangesAsync();
             await _employeeRepository.CommitTransactionAsync();
         }
         catch (Exception ex)
@@ -90,6 +92,7 @@ public class EmployeeService(IEmployeeRepository employeeRepository) : IEmployee
         {
             await _employeeRepository.BeginTransactionAsync();
             var result = await _employeeRepository.DeleteAsync(x => x.Id == id);
+            await _employeeRepository.SaveChangesAsync();
             await _employeeRepository.CommitTransactionAsync();
             return result;
 
@@ -99,8 +102,6 @@ public class EmployeeService(IEmployeeRepository employeeRepository) : IEmployee
             await _employeeRepository.RollbackTransactionAsync();
             return false;
         }
-        
-       
     }
 
 

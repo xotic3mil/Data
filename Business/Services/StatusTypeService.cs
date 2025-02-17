@@ -25,6 +25,7 @@ public class StatusTypeService(IStatusTypeRepository statusTypeRepository) : ISt
         {
             await _statusTypeRepository.BeginTransactionAsync();
             statusTypeEntity = await _statusTypeRepository.CreateAsync(statusTypeEntity);
+            await _statusTypeRepository.SaveChangesAsync();
             await _statusTypeRepository.CommitTransactionAsync();
 
         }
@@ -43,6 +44,7 @@ public class StatusTypeService(IStatusTypeRepository statusTypeRepository) : ISt
         {
             await _statusTypeRepository.BeginTransactionAsync();
             var result = await _statusTypeRepository.DeleteAsync(x => x.Id == id);
+            await _statusTypeRepository.SaveChangesAsync();
             await _statusTypeRepository.CommitTransactionAsync();
             return result;
 
@@ -74,6 +76,7 @@ public class StatusTypeService(IStatusTypeRepository statusTypeRepository) : ISt
         {
             await _statusTypeRepository.BeginTransactionAsync();
             statusEntity = await _statusTypeRepository.UpdateAsync(x => x.Id == status.Id, statusEntity);
+            await _statusTypeRepository.SaveChangesAsync();
             await _statusTypeRepository.CommitTransactionAsync();
         }
         catch (Exception ex)

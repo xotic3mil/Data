@@ -305,7 +305,7 @@
                                       New Service
                                     </title>
                                   </v-col>
-                                  <v-col cols="12" sm="6">
+                                  <v-col cols="12" sm="12">
                                     <v-text-field
                                       append-inner-icon="mdi-text"
                                       variant="solo-filled"
@@ -314,17 +314,36 @@
                                       required
                                     ></v-text-field>
                                   </v-col>
-                                  <v-col cols="12" sm="6">
+                                  <v-col cols="12" sm="12">
+                                    <v-textarea
+                                      append-inner-icon="mdi-text"
+                                      variant="solo-filled"
+                                      v-model="newService.serviceDescription"
+                                      label="Service Description *"
+                                      required
+                                    ></v-textarea>
+                                  </v-col>
+                                  <v-col cols="12" sm="3">
+                                    <v-text-field
+                                      append-inner-icon="mdi-currency-usd"
+                                      variant="solo-filled"
+                                      v-model="newService.startupPrice"
+                                      item-value="id"
+                                      label="Start Up Fee *"
+                                      required
+                                    ></v-text-field>
+                                  </v-col>
+                                  <v-col cols="12" sm="3">
                                     <v-text-field
                                       append-inner-icon="mdi-currency-usd"
                                       variant="solo-filled"
                                       v-model="newService.price"
                                       item-value="id"
-                                      label="Price *"
+                                      label="Monthly Cost *"
                                       required
                                     ></v-text-field>
                                   </v-col>
-                                  <v-col cols="12" sm="6">
+                                  <v-col cols="12" sm="3">
                                     <v-select
                                       variant="solo-filled"
                                       v-model="newService.unitId"
@@ -335,7 +354,7 @@
                                       required
                                     ></v-select>
                                   </v-col>
-                                  <v-col cols="12" sm="6">
+                                  <v-col cols="12" sm="3">
                                     <v-select
                                       variant="solo-filled"
                                       v-model="newService.currencyId"

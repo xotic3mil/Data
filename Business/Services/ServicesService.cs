@@ -25,6 +25,7 @@ public class ServicesService(IServiceRepository serviceRepository) : IServicesSe
         {
             await _serviceRepository.BeginTransactionAsync();
             serviceEntity = await _serviceRepository.CreateAsync(serviceEntity);
+            await _serviceRepository.SaveChangesAsync();
             await _serviceRepository.CommitTransactionAsync();
 
         }
@@ -43,6 +44,7 @@ public class ServicesService(IServiceRepository serviceRepository) : IServicesSe
         {
             await _serviceRepository.BeginTransactionAsync();
             var result = await _serviceRepository.DeleteAsync(x => x.Id == id);
+            await _serviceRepository.SaveChangesAsync();
             await _serviceRepository.CommitTransactionAsync();
             return result;
 
@@ -77,6 +79,7 @@ public class ServicesService(IServiceRepository serviceRepository) : IServicesSe
         {
             await _serviceRepository.BeginTransactionAsync();
             serviceEntity = await _serviceRepository.UpdateAsync(x => x.Id == service.Id, serviceEntity);
+            await _serviceRepository.SaveChangesAsync();
             await _serviceRepository.CommitTransactionAsync();
         }
         catch (Exception ex)

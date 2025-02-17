@@ -42,6 +42,11 @@ public abstract class BaseRepository<TEntity>(AppDbContext context) : IBaseRepos
         }
     }
 
+    public virtual async Task SaveChangesAsync()
+    {
+        await _context.SaveChangesAsync();
+    }
+
     #endregion
 
 
@@ -53,7 +58,6 @@ public abstract class BaseRepository<TEntity>(AppDbContext context) : IBaseRepos
         try
         {
             await _dbSet.AddAsync(entity);
-            await _context.SaveChangesAsync();
             return entity;
         }
 
@@ -94,7 +98,6 @@ public abstract class BaseRepository<TEntity>(AppDbContext context) : IBaseRepos
             _context.Entry(existingEntity).CurrentValues
                 .SetValues(updatedEntity);
 
-            await _context.SaveChangesAsync();
             return existingEntity;
         }
 
@@ -119,7 +122,6 @@ public abstract class BaseRepository<TEntity>(AppDbContext context) : IBaseRepos
                 return false;
 
             _dbSet.Remove(existingEntity);
-            await _context.SaveChangesAsync();
             return true;
         }
 

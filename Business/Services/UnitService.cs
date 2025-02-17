@@ -30,6 +30,7 @@ namespace Business.Services
             {
                 await _unitRepository.BeginTransactionAsync();
                 UnitEntity = await _unitRepository.CreateAsync(UnitEntity);
+                await _unitRepository.SaveChangesAsync();
                 await _unitRepository.CommitTransactionAsync();
             }
             catch (Exception ex)
@@ -47,6 +48,7 @@ namespace Business.Services
             {
                 await _unitRepository.BeginTransactionAsync();
                 var result = await _unitRepository.DeleteAsync(x => x.Id == id);
+                await _unitRepository.SaveChangesAsync();
                 await _unitRepository.CommitTransactionAsync();
                 return result;
             }
@@ -77,6 +79,7 @@ namespace Business.Services
             {
                 await _unitRepository.BeginTransactionAsync();
                 UnitEntity = await _unitRepository.UpdateAsync(x => x.Id == units.Id, UnitEntity);
+                await _unitRepository.SaveChangesAsync();
                 await _unitRepository.CommitTransactionAsync();
             }
             catch (Exception ex)

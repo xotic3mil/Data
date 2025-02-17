@@ -23,6 +23,11 @@ public class ServiceEntity
     public decimal Price { get; set; }
 
     [Required]
+    [ForeignKey(nameof(Employee))]
+    public int EmployeeId { get; set; }
+    public EmployeeEntity Employee { get; set; } = null!;
+
+    [Required]
     public int UnitId { get; set; }
     [ForeignKey(nameof(UnitId))]
     public UnitEntity? Units { get; set; }

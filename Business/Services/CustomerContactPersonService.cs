@@ -30,6 +30,7 @@ namespace Business.Services
             {
                 await _customerContactPersonRepository.BeginTransactionAsync();
                 customerContactPersonEntity = await _customerContactPersonRepository.CreateAsync(customerContactPersonEntity);
+                await _customerContactPersonRepository.SaveChangesAsync();
                 await _customerContactPersonRepository.CommitTransactionAsync();
             }
             catch (Exception ex)
@@ -46,6 +47,7 @@ namespace Business.Services
             {
                 await _customerContactPersonRepository.BeginTransactionAsync();
                 var result = await _customerContactPersonRepository.DeleteAsync(x => x.Id == id);
+                await _customerContactPersonRepository.SaveChangesAsync();
                 await _customerContactPersonRepository.CommitTransactionAsync();
                 return result;
             }
@@ -82,6 +84,7 @@ namespace Business.Services
             {
                 await _customerContactPersonRepository.BeginTransactionAsync();
                 customerContactPersonEntity = await _customerContactPersonRepository.UpdateAsync(x => x.Id == customerContactPerson.Id, customerContactPersonEntity);
+                await _customerContactPersonRepository.SaveChangesAsync();
                 await _customerContactPersonRepository.CommitTransactionAsync();
             }
             catch (Exception ex)

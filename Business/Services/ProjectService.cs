@@ -25,6 +25,7 @@ public class ProjectService(IProjectRespository projectRespository) : IProjectsS
         {
             await _projectRespository.BeginTransactionAsync();
             projectEntity = await _projectRespository.CreateAsync(projectEntity);
+            await _projectRespository.SaveChangesAsync();
             await _projectRespository.CommitTransactionAsync();
         }
         catch (Exception ex)
@@ -68,6 +69,7 @@ public class ProjectService(IProjectRespository projectRespository) : IProjectsS
         {
             await _projectRespository.BeginTransactionAsync();
             projectEntity = await _projectRespository.UpdateAsync(x => x.Id == projects.Id, projectEntity);
+            await _projectRespository.SaveChangesAsync();
             await _projectRespository.CommitTransactionAsync();
         }
         catch (Exception ex)
@@ -86,6 +88,7 @@ public class ProjectService(IProjectRespository projectRespository) : IProjectsS
         {
             await _projectRespository.BeginTransactionAsync();
             var result = await _projectRespository.DeleteAsync(x => x.Id == id);
+            await _projectRespository.SaveChangesAsync();
             await _projectRespository.CommitTransactionAsync();
             return result;
         }

@@ -31,6 +31,7 @@ namespace Business.Services
             {
                 await _currencyRepository.BeginTransactionAsync();
                 currencyEntity = await _currencyRepository.CreateAsync(currencyEntity);
+                await _currencyRepository.SaveChangesAsync();
                 await _currencyRepository.CommitTransactionAsync();
             }
             catch (Exception ex)
@@ -49,6 +50,7 @@ namespace Business.Services
             {
                 await _currencyRepository.BeginTransactionAsync();
                 var result = await _currencyRepository.DeleteAsync(x => x.Id == id);
+                await _currencyRepository.SaveChangesAsync();
                 await _currencyRepository.CommitTransactionAsync();
                 return result;
             }
@@ -83,6 +85,7 @@ namespace Business.Services
             {
                 await _currencyRepository.BeginTransactionAsync();
                 currencyEntity = await _currencyRepository.UpdateAsync(x => x.Id == currencies.Id, currencyEntity);
+                await _currencyRepository.SaveChangesAsync();
                 await _currencyRepository.CommitTransactionAsync();
             }
             catch (Exception ex)

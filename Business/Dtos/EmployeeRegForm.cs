@@ -1,6 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.Runtime.CompilerServices;
-using FluentValidation;
 
 namespace Business.Dtos;
 
