@@ -763,6 +763,7 @@ const priority = ref([
   { id: 1, name: "Low" },
   { id: 2, name: "Medium" },
   { id: 3, name: "High" },
+  { id: 4, name: "Critical" },
 ]);
 
 const selectedRoleId = ref(3);
@@ -861,6 +862,7 @@ const priorityColorMapping = {
   Low: "green",
   Medium: "orange",
   High: "red",
+  Critical: "deep-purple-darken-2",
 };
 
 function getpriorityColor(status) {
@@ -939,7 +941,7 @@ async function deleteItemConfirm() {
     snackbar.value = {
       show: true,
       message: "Project was deleted successfully!",
-      color: "success",
+      color: "error",
     };
 
     if (!response.ok) throw new Error("Delete failed");
@@ -1147,6 +1149,25 @@ async function save() {
     let response;
     if (editedIndex.value > -1) {
       // Update existing project
+      const statusObj = status.value.find(
+        (s) => s.id === Number(editedItem.value.statusId)
+      );
+      const customerObj = customer.value.find(
+        (c) => c.id === Number(editedItem.value.customerId)
+      );
+      const employeeObj = employee.value.find(
+        (e) => e.id === Number(editedItem.value.employeeId)
+      );
+      const serviceObj = service.value.find(
+        (s) => s.id === Number(editedItem.value.serviceId)
+      );
+
+      // Get the service employee with roles
+      const serviceEmployee = employee.value.find(
+        (e) => e.id === serviceObj?.employeeId
+      );
+
+      // Update existing project with complete nested objects
       const payload = {
         id: editedItem.value.id,
         projectNumber: editedItem.value.projectNumber,
@@ -1159,6 +1180,19 @@ async function save() {
         customerId: Number(editedItem.value.customerId),
         employeeId: Number(editedItem.value.employeeId),
         serviceId: Number(editedItem.value.serviceId),
+        status: statusObj,
+        customers: customerObj,
+        employee: employeeObj,
+        service: {
+          ...serviceObj,
+          employee: {
+            ...serviceEmployee,
+            roles: serviceEmployee?.roles || {
+              id: 11,
+              roleName: "Product Owner",
+            },
+          },
+        },
       };
 
       console.log("Update Payload:", payload);
