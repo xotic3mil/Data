@@ -6,8 +6,6 @@ using Data.Interfaces;
 using Data.Repositories;
 using Microsoft.EntityFrameworkCore;
 using FluentValidation;
-using FluentValidation.AspNetCore;
-using Business.Dtos.Validators;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -16,10 +14,6 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers();
 builder.Services.AddOpenApi();
 builder.Services.AddScoped<ValidatorConfiguration>();
-
-// FluentValidation
-builder.Services.AddFluentValidationAutoValidation();
-builder.Services.AddValidatorsFromAssemblyContaining<EmployeeRegFormValidator>();
 
 // Register DbContext
 builder.Services.AddDbContext<AppDbContext>(x => x.UseNpgsql(builder.Configuration.GetConnectionString("PostgreSQL")));
