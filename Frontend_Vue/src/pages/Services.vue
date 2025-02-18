@@ -85,8 +85,9 @@
                             :items="filteredEmployees"
                             item-value="id"
                             item-title="fullName"
-                            label="Product Owner *"
+                            label="Product Manager *"
                             required
+                            no-data-text="No Product Managers available"
                           ></v-select>
                         </v-col>
                         <v-col cols="12" sm="12">
@@ -275,7 +276,7 @@ const employees = ref([]);
 const currencies = ref([]);
 const editedIndex = ref(-1);
 
-const selectedRoleId = ref(4);
+const selectedRoleId = ref(11);
 const filteredEmployees = computed(() => {
   return employees.value.filter(
     (emp) => emp.roles && Number(emp.roles.id) === Number(selectedRoleId.value)

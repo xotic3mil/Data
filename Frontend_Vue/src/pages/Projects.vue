@@ -748,7 +748,7 @@ const priority = ref([
   { id: 3, name: "High" },
 ]);
 
-const selectedRoleId = ref(1);
+const selectedRoleId = ref(3);
 const filteredEmployees = computed(() => {
   return employee.value.filter(
     (emp) => emp.roles && Number(emp.roles.id) === Number(selectedRoleId.value)
