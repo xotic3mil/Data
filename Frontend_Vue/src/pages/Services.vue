@@ -26,6 +26,7 @@
           :sort-by="[{ key: 'id', order: 'asc' }]"
           item-value="id"
           show-expand
+          no-data-text="Please add new service(s)."
         >
           <template v-slot:item.serviceDescription="{ item }">
             {{

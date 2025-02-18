@@ -34,6 +34,7 @@
             :title="`Projects`"
             :sort-by="[{ key: 'id', order: 'asc' }]"
             item-value="id"
+            no-data-text="Please add new project(s)"
             show-expand
           >
             <template v-slot:item.status="{ item }">

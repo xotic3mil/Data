@@ -31,6 +31,7 @@
             :sort-by="[{ key: 'id', order: 'asc' }]"
             item-value="id"
             show-expand
+            no-data-text="Please add new employee(s)"
           >
             <template v-slot:expanded-row="{ columns, item }">
               <tr>
