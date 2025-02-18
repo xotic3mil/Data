@@ -9,7 +9,9 @@ public class Service
     public decimal Price { get; set; }
     public int UnitId { get; set; }
     public int CurrencyId {get; set;}
+    public int EmployeeId { get; set; }
     public Units Units { get; set; } = null!;
     public Currencies Currencies { get; set; } = null!;
+    public Employee Employee { get; set; } = null!;
 
 }

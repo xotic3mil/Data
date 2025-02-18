@@ -213,6 +213,9 @@ namespace Data.Migrations
                     b.Property<int>("CurrencyId")
                         .HasColumnType("integer");
 
+                    b.Property<int>("EmployeeId")
+                        .HasColumnType("integer");
+
                     b.Property<decimal>("Price")
                         .HasColumnType("numeric");
 
@@ -234,6 +237,8 @@ namespace Data.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("CurrencyId");
+
+                    b.HasIndex("EmployeeId");
 
                     b.HasIndex("UnitId");
 
@@ -339,6 +344,12 @@ namespace Data.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("Data.Entities.EmployeeEntity", "Employee")
+                        .WithMany("Services")
+                        .HasForeignKey("EmployeeId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
                     b.HasOne("Data.Entities.UnitEntity", "Units")
                         .WithMany()
                         .HasForeignKey("UnitId")
@@ -346,6 +357,8 @@ namespace Data.Migrations
                         .IsRequired();
 
                     b.Navigation("Currencies");
+
+                    b.Navigation("Employee");
 
                     b.Navigation("Units");
                 });
@@ -363,6 +376,8 @@ namespace Data.Migrations
             modelBuilder.Entity("Data.Entities.EmployeeEntity", b =>
                 {
                     b.Navigation("Projects");
+
+                    b.Navigation("Services");
                 });
 
             modelBuilder.Entity("Data.Entities.RolesEntity", b =>

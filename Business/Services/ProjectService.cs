@@ -77,7 +77,6 @@ public class ProjectService(IProjectRespository projectRespository) : IProjectsS
             await _projectRespository.RollbackTransactionAsync();
             return null!;
         }
-       
         return ProjectFactory.Create(projectEntity);
     }
 

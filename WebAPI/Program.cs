@@ -5,7 +5,6 @@ using Data.Entities;
 using Data.Interfaces;
 using Data.Repositories;
 using Microsoft.EntityFrameworkCore;
-using FluentValidation;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -13,7 +12,7 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 builder.Services.AddControllers();
 builder.Services.AddOpenApi();
-builder.Services.AddScoped<ValidatorConfiguration>();
+
 
 // Register DbContext
 builder.Services.AddDbContext<AppDbContext>(x => x.UseNpgsql(builder.Configuration.GetConnectionString("PostgreSQL")));

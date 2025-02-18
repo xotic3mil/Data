@@ -12,8 +12,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Data.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20250215234105_AddedMoreRowsToService")]
-    partial class AddedMoreRowsToService
+    [Migration("20250218090059_DatabaseUpdate")]
+    partial class DatabaseUpdate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -146,8 +146,8 @@ namespace Data.Migrations
 
                     b.Property<string>("Description")
                         .IsRequired()
-                        .HasMaxLength(500)
-                        .HasColumnType("character varying(500)");
+                        .HasMaxLength(800)
+                        .HasColumnType("character varying(800)");
 
                     b.Property<int>("EmployeeId")
                         .HasColumnType("integer");
@@ -216,13 +216,16 @@ namespace Data.Migrations
                     b.Property<int>("CurrencyId")
                         .HasColumnType("integer");
 
+                    b.Property<int>("EmployeeId")
+                        .HasColumnType("integer");
+
                     b.Property<decimal>("Price")
                         .HasColumnType("numeric");
 
                     b.Property<string>("ServiceDescription")
                         .IsRequired()
-                        .HasMaxLength(500)
-                        .HasColumnType("character varying(500)");
+                        .HasMaxLength(800)
+                        .HasColumnType("character varying(800)");
 
                     b.Property<string>("ServiceName")
                         .IsRequired()
@@ -237,6 +240,8 @@ namespace Data.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("CurrencyId");
+
+                    b.HasIndex("EmployeeId");
 
                     b.HasIndex("UnitId");
 
@@ -342,6 +347,12 @@ namespace Data.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("Data.Entities.EmployeeEntity", "Employee")
+                        .WithMany()
+                        .HasForeignKey("EmployeeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("Data.Entities.UnitEntity", "Units")
                         .WithMany()
                         .HasForeignKey("UnitId")
@@ -349,6 +360,8 @@ namespace Data.Migrations
                         .IsRequired();
 
                     b.Navigation("Currencies");
+
+                    b.Navigation("Employee");
 
                     b.Navigation("Units");
                 });

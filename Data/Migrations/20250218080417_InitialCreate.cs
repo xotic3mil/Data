@@ -131,7 +131,10 @@ namespace Data.Migrations
                     Id = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     ServiceName = table.Column<string>(type: "text", nullable: false),
+                    ServiceDescription = table.Column<string>(type: "character varying(800)", maxLength: 800, nullable: false),
+                    StartupPrice = table.Column<decimal>(type: "numeric", nullable: false),
                     Price = table.Column<decimal>(type: "numeric", nullable: false),
+                    EmployeeId = table.Column<int>(type: "integer", nullable: false),
                     UnitId = table.Column<int>(type: "integer", nullable: false),
                     CurrencyId = table.Column<int>(type: "integer", nullable: false)
                 },
@@ -142,6 +145,12 @@ namespace Data.Migrations
                         name: "FK_Services_Currencies_CurrencyId",
                         column: x => x.CurrencyId,
                         principalTable: "Currencies",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_Services_Employees_EmployeeId",
+                        column: x => x.EmployeeId,
+                        principalTable: "Employees",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
@@ -158,13 +167,12 @@ namespace Data.Migrations
                 {
                     Id = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    ProjectNumber = table.Column<int>(type: "integer", nullable: false),
+                    ProjectNumber = table.Column<Guid>(type: "uuid", nullable: false),
                     Name = table.Column<string>(type: "text", nullable: false),
-                    Description = table.Column<string>(type: "text", nullable: false),
-                    CreatedAt = table.Column<DateOnly>(type: "date", nullable: true),
-                    UpdatedAt = table.Column<DateOnly>(type: "date", nullable: true),
+                    Description = table.Column<string>(type: "character varying(800)", maxLength: 800, nullable: false),
                     StartDate = table.Column<DateOnly>(type: "date", nullable: false),
                     EndDate = table.Column<DateOnly>(type: "date", nullable: false),
+                    Priority = table.Column<string>(type: "text", nullable: false),
                     StatusId = table.Column<int>(type: "integer", nullable: false),
                     EmployeeId = table.Column<int>(type: "integer", nullable: false),
                     ServiceId = table.Column<int>(type: "integer", nullable: false),
@@ -241,6 +249,11 @@ namespace Data.Migrations
                 column: "CurrencyId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_Services_EmployeeId",
+                table: "Services",
+                column: "EmployeeId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Services_UnitId",
                 table: "Services",
                 column: "UnitId");
@@ -256,9 +269,6 @@ namespace Data.Migrations
                 name: "Customers");
 
             migrationBuilder.DropTable(
-                name: "Employees");
-
-            migrationBuilder.DropTable(
                 name: "Services");
 
             migrationBuilder.DropTable(
@@ -268,13 +278,16 @@ namespace Data.Migrations
                 name: "CustomerContactPerson");
 
             migrationBuilder.DropTable(
-                name: "Roles");
-
-            migrationBuilder.DropTable(
                 name: "Currencies");
 
             migrationBuilder.DropTable(
+                name: "Employees");
+
+            migrationBuilder.DropTable(
                 name: "Units");
+
+            migrationBuilder.DropTable(
+                name: "Roles");
         }
     }
 }

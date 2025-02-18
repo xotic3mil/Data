@@ -12,8 +12,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Data.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20250211082835_addedPriorityInProjects")]
-    partial class addedPriorityInProjects
+    [Migration("20250218080417_InitialCreate")]
+    partial class InitialCreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -141,15 +141,13 @@ namespace Data.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
-                    b.Property<DateOnly?>("CreatedAt")
-                        .HasColumnType("date");
-
                     b.Property<int>("CustomerId")
                         .HasColumnType("integer");
 
                     b.Property<string>("Description")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasMaxLength(800)
+                        .HasColumnType("character varying(800)");
 
                     b.Property<int>("EmployeeId")
                         .HasColumnType("integer");
@@ -165,8 +163,8 @@ namespace Data.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<int>("ProjectNumber")
-                        .HasColumnType("integer");
+                    b.Property<Guid>("ProjectNumber")
+                        .HasColumnType("uuid");
 
                     b.Property<int>("ServiceId")
                         .HasColumnType("integer");
@@ -176,9 +174,6 @@ namespace Data.Migrations
 
                     b.Property<int>("StatusId")
                         .HasColumnType("integer");
-
-                    b.Property<DateOnly?>("UpdatedAt")
-                        .HasColumnType("date");
 
                     b.HasKey("Id");
 
@@ -221,12 +216,23 @@ namespace Data.Migrations
                     b.Property<int>("CurrencyId")
                         .HasColumnType("integer");
 
+                    b.Property<int>("EmployeeId")
+                        .HasColumnType("integer");
+
                     b.Property<decimal>("Price")
                         .HasColumnType("numeric");
+
+                    b.Property<string>("ServiceDescription")
+                        .IsRequired()
+                        .HasMaxLength(800)
+                        .HasColumnType("character varying(800)");
 
                     b.Property<string>("ServiceName")
                         .IsRequired()
                         .HasColumnType("text");
+
+                    b.Property<decimal>("StartupPrice")
+                        .HasColumnType("numeric");
 
                     b.Property<int>("UnitId")
                         .HasColumnType("integer");
@@ -234,6 +240,8 @@ namespace Data.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("CurrencyId");
+
+                    b.HasIndex("EmployeeId");
 
                     b.HasIndex("UnitId");
 
@@ -339,6 +347,12 @@ namespace Data.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("Data.Entities.EmployeeEntity", "Employee")
+                        .WithMany()
+                        .HasForeignKey("EmployeeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("Data.Entities.UnitEntity", "Units")
                         .WithMany()
                         .HasForeignKey("UnitId")
@@ -346,6 +360,8 @@ namespace Data.Migrations
                         .IsRequired();
 
                     b.Navigation("Currencies");
+
+                    b.Navigation("Employee");
 
                     b.Navigation("Units");
                 });

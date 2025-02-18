@@ -55,6 +55,13 @@ protected override void OnModelCreating(ModelBuilder modelBuilder)
             .HasForeignKey(c => c.CustomerContactPersonId)
             .OnDelete(DeleteBehavior.Restrict);
 
+        modelBuilder.Entity<ServiceEntity>()
+            .HasOne(s => s.Employee)
+            .WithMany(e => e.Services)
+            .HasForeignKey(s => s.EmployeeId)
+            .OnDelete(DeleteBehavior.Restrict);
+
+
     }
         
 }

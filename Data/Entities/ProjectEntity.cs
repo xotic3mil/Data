@@ -29,30 +29,30 @@ public class ProjectEntity
     [Required]
     [ForeignKey(nameof(StatusId))]
     public int StatusId { get; set; }
-    public StatusTypesEntity Status { get; set; }
+    public StatusTypesEntity Status { get; set; } = null!;
 
     [Required]
     [ForeignKey(nameof(Employee))]
     public int EmployeeId { get; set; }
-    public EmployeeEntity Employee { get; set; }
+    public EmployeeEntity Employee { get; set; } = null!;
 
     [Required]
     [ForeignKey(nameof(Service))]
     public int ServiceId { get; set; }
-    public ServiceEntity Service { get; set; }
+    public ServiceEntity Service { get; set; } = null!;
 
     [Required]
     [ForeignKey(nameof(Customer))]
     public int CustomerId { get; set; }
-    public CustomerEntity Customer { get; set; }
+    public CustomerEntity Customer { get; set; } = null!;
 
 
 
 
-   
-    
-    
-    
+
+
+
+
 }
 
 

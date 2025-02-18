@@ -35,6 +35,10 @@
             }}
           </template>
 
+          <template v-slot:item.employee="{ item }">
+            {{ item.employee.firstName }} {{ item.employee.lastName }}
+          </template>
+
           <template v-slot:top>
             <v-toolbar flat>
               <v-toolbar-title>Services</v-toolbar-title>
@@ -74,6 +78,16 @@
                             v-model="editedItem.serviceDescription"
                             label="Service Description *"
                           ></v-textarea>
+                        </v-col>
+                        <v-col cols="12" sm="12">
+                          <v-select
+                            v-model="editedItem.employeeId"
+                            :items="filteredEmployees"
+                            item-value="id"
+                            item-title="fullName"
+                            label="Product Owner *"
+                            required
+                          ></v-select>
                         </v-col>
                         <v-col cols="12" sm="12">
                           <v-text-field
@@ -250,19 +264,29 @@
 <script setup>
 import { ref, computed, onMounted, watchEffect } from "vue";
 import { renderDescription } from "@/services/markdownService.js";
+import { fetchEmployees } from "@/services/apiService.js";
 
 const expanded = ref(false);
 const dialog = ref(false);
 const dialogDelete = ref(false);
 const services = ref([]);
 const units = ref([]);
+const employees = ref([]);
 const currencies = ref([]);
 const editedIndex = ref(-1);
+
+const selectedRoleId = ref(4);
+const filteredEmployees = computed(() => {
+  return employees.value.filter(
+    (emp) => emp.roles && Number(emp.roles.id) === Number(selectedRoleId.value)
+  );
+});
 
 const headers = [
   { title: "ID", key: "id" },
   { title: "Service Name", key: "serviceName" },
   { title: "Description", key: "serviceDescription" },
+  { title: "Product Manager", key: "employee" },
   { title: "Start Up Fee", key: "formattedStartupPrice" },
   { title: "Price", key: "formattedPrice" },
   { title: "Unit", key: "unit" },
@@ -274,6 +298,7 @@ const editedItem = ref({
   id: null,
   serviceName: "",
   serviceDescription: "",
+  employeeId: null,
   price: "",
   unitId: null,
   currencyId: null,
@@ -283,6 +308,7 @@ const defaultItem = {
   id: null,
   serviceName: "",
   serviceDescription: "",
+  employeeId: null,
   price: "",
   unitId: null,
   currencyId: null,
@@ -299,6 +325,7 @@ async function fetchServices() {
     const rawServices = await response.json();
     // Map each service object to include the actual unit and currency values
     services.value = rawServices.map((service) => {
+      const emp = employees.value.find((e) => e.id === service.employeeId);
       const unitObj = units.value.find((u) => u.id === service.unitId);
       const currencyObj = currencies.value.find(
         (c) => c.id === service.currencyId
@@ -306,7 +333,9 @@ async function fetchServices() {
       return {
         ...service,
         unit: unitObj ? unitObj.unit : "",
+        employees: emp || {},
         currency: currencyObj ? currencyObj.currency : "",
+
         formattedPrice: new Intl.NumberFormat("sv-SE", {
           style: "currency",
           currency: "SEK",
@@ -401,12 +430,34 @@ const snackbar = ref({
 
 async function save() {
   try {
+    // Build payload with proper types
+    const payload = {
+      ...editedItem.value,
+      startupPrice: Number(editedItem.value.startupPrice),
+      price: Number(editedItem.value.price),
+      unitId: Number(editedItem.value.unitId),
+      currencyId: Number(editedItem.value.currencyId),
+      employeeId: Number(editedItem.value.employeeId),
+    };
+
+    // Look up nested objects
+    const unitObj = units.value.find((u) => u.id === payload.unitId);
+    const currencyObj = currencies.value.find(
+      (c) => c.id === payload.currencyId
+    );
+    const employeeObj = employees.value.find(
+      (e) => e.id === payload.employeeId
+    );
+    payload.units = unitObj ? { ...unitObj } : null;
+    payload.currencies = currencyObj ? { ...currencyObj } : null;
+    payload.employee = employeeObj ? { ...employeeObj } : null;
+
     if (editedIndex.value > -1) {
-      // Update existing
+      // Update existing service without appending the id to the URL
       const response = await fetch("http://192.168.1.6:5000/api/services", {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(editedItem.value),
+        body: JSON.stringify(payload),
       });
 
       if (response.status === 409) {
@@ -417,19 +468,19 @@ async function save() {
         };
         return;
       }
-
       if (!response.ok) throw new Error("Update failed");
+
       snackbar.value = {
         show: true,
         message: "Service updated successfully!",
         color: "success",
       };
     } else {
-      // Create new
+      // Create a new service
       const response = await fetch("http://192.168.1.6:5000/api/services", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(editedItem.value),
+        body: JSON.stringify(payload),
       });
 
       if (response.status === 409) {
@@ -440,7 +491,6 @@ async function save() {
         };
         return;
       }
-
       if (!response.ok) throw new Error("Create failed");
 
       snackbar.value = {
@@ -462,6 +512,7 @@ watchEffect(() => {
 
 onMounted(async () => {
   await fetchUnits();
+  employees.value = await fetchEmployees();
   await fetchCurrencies();
   await fetchServices();
 });

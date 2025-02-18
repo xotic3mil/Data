@@ -11,6 +11,7 @@ public class ServiceRegForm
     public decimal Price { get; set; }
     public int UnitId { get; set; }
     public int CurrencyId { get; set; }
+    public int EmployeeId { get; set; }
 
 
 

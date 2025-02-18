@@ -24,6 +24,7 @@ export async function fetchCustomerContact() {
     throw error;
   }
 }
+const employeesUrl = "http://192.168.1.6:5000/api/employees";
 
 export async function fetchEmployees() {
   try {
@@ -41,10 +42,62 @@ export async function fetchEmployees() {
   }
 }
 
+export async function createEmployee(employee) {
+  try {
+    const response = await fetch(employeesUrl, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(employee),
+    });
+    if (response.status === 409) {
+      throw new Error("Employee already exists");
+    }
+    if (!response.ok) throw new Error("Creation failed");
+    return response.json();
+  } catch (error) {
+    console.error("Error in createEmployee:", error);
+    throw error;
+  }
+}
+
+export async function updateEmployee(employee) {
+  try {
+    const response = await fetch(rolesUrl, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(employee),
+    });
+    if (response.status === 409) {
+      throw new Error("Employee already exists");
+    }
+    if (!response.ok) throw new Error("Update failed");
+    return response.json();
+  } catch (error) {
+    console.error("Error in updateEmployee:", error);
+    throw error;
+  }
+}
+
+export async function deleteEmployee(id) {
+  try {
+    const response = await fetch(`${employeesUrl}/${id}`, {
+      method: "DELETE",
+    });
+    if (!response.ok) throw new Error("Delete failed");
+    return response.json();
+  } catch (error) {
+    console.error("Error in deleteEmployee:", error);
+    throw error;
+  }
+}
+
 export async function fetchServices() {
   try {
     const response = await fetch("http://192.168.1.6:5000/api/services");
-    if (!response.ok) throw new Error("Failed to fetch services");
+    if (!response.ok) {
+      console.error("Status code:", response.status);
+      throw new Error("Failed to fetch services");
+    }
     return response.json();
   } catch (error) {
     console.error("Error in fetchServices:", error);
@@ -114,10 +167,9 @@ export async function fetchRevenue() {
   }
 }
 
-/// Roles MANAGEMENT
+//#region Roles
 
 const rolesUrl = "http://192.168.1.6:5000/api/roles";
-
 
 export async function fetchRoles() {
   try {
@@ -178,6 +230,8 @@ export async function deleteRole(id) {
     throw error;
   }
 }
+
+//#endregion
 
 export async function fetchStats() {
   try {

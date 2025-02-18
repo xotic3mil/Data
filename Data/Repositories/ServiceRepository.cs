@@ -18,6 +18,7 @@ public class ServiceRepository(AppDbContext context) : BaseRepository<ServiceEnt
             return await _context.Services
                 .Include(u => u.Units)
                 .Include(c => c.Currencies)
+                .Include(e => e.Employee)
                 .ToListAsync();
             
 

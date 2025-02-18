@@ -14,9 +14,9 @@ public class ServiceFactory
         ServiceDescription = form.ServiceDescription,
         Price = form.Price,
         StartupPrice = form.StartupPrice,
+        EmployeeId = form.EmployeeId,
         UnitId = form.UnitId,
         CurrencyId = form.CurrencyId
-
     };
 
     public static Service Create(ServiceEntity entity) => new()
@@ -30,7 +30,8 @@ public class ServiceFactory
         CurrencyId = entity.CurrencyId,
         Units = entity.Units != null ? UnitFactory.Create(entity.Units) : null,
         Currencies = entity.Currencies != null ? CurrencyFactory.Create(entity.Currencies) : null,
-
+        Employee = entity.Employee != null ? EmployeeFactory.Create(entity.Employee) : null,
+        EmployeeId = entity.EmployeeId,
     };
 
     public static ServiceEntity Create(Service service, int Id) => new()
@@ -42,6 +43,7 @@ public class ServiceFactory
         Price = service.Price,
         UnitId = service.UnitId,
         CurrencyId = service.CurrencyId,
-   
+        EmployeeId = service.EmployeeId,
+
     };
 }

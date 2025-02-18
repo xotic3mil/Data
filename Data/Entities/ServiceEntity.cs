@@ -30,13 +30,13 @@ public class ServiceEntity
     [Required]
     public int UnitId { get; set; }
     [ForeignKey(nameof(UnitId))]
-    public UnitEntity? Units { get; set; }
+    public UnitEntity? Units { get; set; } = null!;
 
     [Required]
     public int CurrencyId { get; set; }
     [ForeignKey(nameof(CurrencyId))]
-    public CurrencyEntity? Currencies { get; set; }
+    public CurrencyEntity? Currencies { get; set; } = null!;
 
     // To see which Projects are using this service
-    public ICollection<ProjectEntity>? Projects { get; set; }
+    public ICollection<ProjectEntity>? Projects { get; set; } 
 }

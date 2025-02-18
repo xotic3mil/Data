@@ -33,9 +33,9 @@ public class EmployeeEntity
     [ForeignKey(nameof(RoleId))]
     public RolesEntity Role { get; set; } = null!;
 
-    // Navigation (optional): List of projects this employee is responsible for, if 1-to-many
     public ICollection<ProjectEntity>? Projects { get; set; }
 
+    public ICollection<ServiceEntity> Services { get; set; } = new List<ServiceEntity>();
 
 }
 
