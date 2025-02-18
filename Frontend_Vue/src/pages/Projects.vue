@@ -324,6 +324,19 @@
                                       required
                                     ></v-textarea>
                                   </v-col>
+                                  <v-col cols="12" sm="12">
+                                    <v-select
+                                      append-inner-icon="mdi-text"
+                                      variant="solo-filled"
+                                      :items="filteredProductEmployees"
+                                      v-model="newService.employeeId"
+                                      item-value="id"
+                                      item-title="fullName"
+                                      label="Product Manager*"
+                                      no-data-text="No Product Managers available"
+                                      required
+                                    ></v-select>
+                                  </v-col>
                                   <v-col cols="12" sm="3">
                                     <v-text-field
                                       append-inner-icon="mdi-currency-usd"
@@ -494,7 +507,10 @@
                                       "
                                       :items="customerContactPerson"
                                       item-value="id"
-                                      item-title="fullName"
+                                      :item-title="
+                                        (item) =>
+                                          `${item.firstName} ${item.lastName} - ${item.email}`
+                                      "
                                       label="Customer Contact *"
                                       required
                                     ></v-select>
@@ -756,6 +772,14 @@ const filteredEmployees = computed(() => {
   );
 });
 
+const selectedRoleOwnerId = ref(11);
+const filteredProductEmployees = computed(() => {
+  return employee.value.filter(
+    (emp) =>
+      emp.roles && Number(emp.roles.id) === Number(selectedRoleOwnerId.value)
+  );
+});
+
 const headers = [
   { title: "ID", key: "id" },
   { title: "Status", key: "status" },
@@ -784,9 +808,12 @@ const newCustomer = ref({
 
 const newService = ref({
   serviceName: "",
+  serviceDescription: "",
+  startupPrice: "",
   price: "",
   unitId: null,
   currencyId: null,
+  employeeId: null,
 });
 
 const editedItem = ref({
@@ -946,9 +973,12 @@ async function saveService() {
   try {
     const servicePayload = {
       serviceName: newService.value.serviceName,
+      serviceDescription: newService.value.serviceDescription,
+      startupPrice: newService.value.startupPrice,
       price: newService.value.price,
       unitId: newService.value.unitId,
       currencyId: newService.value.currencyId,
+      employeeId: newService.value.employeeId,
     };
 
     const response = await fetch("http://192.168.1.6:5000/api/services", {
@@ -958,33 +988,49 @@ async function saveService() {
     });
 
     if (!response.ok) {
-      throw new Error("Failed to save service ");
+      throw new Error("Failed to save service");
     }
 
-    const result = await response.json();
-    console.log("service saved:", result);
+    const savedService = await response.json();
+    console.log("Service saved:", savedService);
 
-    // Optionally, show a success message (for example via a snackbar)
-    // Reset the form state if needed:
+    // Add the new service to the local array
+    service.value.push(savedService);
+
+    // Show success message
+    snackbar.value = {
+      show: true,
+      message: "Service created successfully!",
+      color: "success",
+    };
+
+    // Reset the form
     newService.value = {
       serviceName: "",
+      serviceDescription: "",
+      startupPrice: "",
       price: "",
       unitId: null,
       currencyId: null,
+      employeeId: null,
     };
     newServiceVisible.value = false;
-    await fetchServices();
   } catch (error) {
-    console.error("Error saving customer:", error);
-    // Optionally, show an error message
+    console.error("Error saving service:", error);
+    snackbar.value = {
+      show: true,
+      message: "Failed to save service: " + error.message,
+      color: "error",
+    };
   }
 }
-
 async function saveCustomer() {
   try {
     const customerPayload = {
       companyName: newCustomer.value.companyName,
-      customerContactPersonId: newCustomer.value.customerContactPersonId,
+      customerContactPersonId: Number(
+        newCustomer.value.customerContactPersonId
+      ),
     };
 
     const response = await fetch("http://192.168.1.6:5000/api/customers", {
@@ -994,23 +1040,35 @@ async function saveCustomer() {
     });
 
     if (!response.ok) {
-      throw new Error("Failed to save customer ");
+      throw new Error("Failed to save customer");
     }
 
-    const result = await response.json();
-    console.log("Customer saved:", result);
+    const savedCustomer = await response.json();
+    console.log("Customer saved:", savedCustomer);
 
-    // Optionally, show a success message (for example via a snackbar)
-    // Reset the form state if needed:
+    // Add the new customer to the local array
+    customer.value.push(savedCustomer);
+
+    // Show success message
+    snackbar.value = {
+      show: true,
+      message: "Customer created successfully!",
+      color: "success",
+    };
+
+    // Reset the form
     newCustomer.value = {
       companyName: "",
       customerContactPersonId: null,
     };
     newCustomerVisible.value = false;
-    await fetchCustomers();
   } catch (error) {
     console.error("Error saving customer:", error);
-    // Optionally, show an error message
+    snackbar.value = {
+      show: true,
+      message: "Failed to save customer: " + error.message,
+      color: "error",
+    };
   }
 }
 
@@ -1023,22 +1081,47 @@ async function saveCustomerContact() {
       phone: newCustomerContact.value.phone,
     };
 
-    const response = await fetch("http://192.168.1.6:5000/api/contactperson/", {
+    console.log("Sending customer contact payload:", customerContactPayload);
+
+    const response = await fetch("http://192.168.1.6:5000/api/contactperson", {
+      // Removed trailing slash
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(customerContactPayload),
     });
 
+    const responseText = await response.text();
+    console.log("Response Status:", response.status);
+    console.log("Response Body:", responseText);
+
     if (!response.ok) {
-      throw new Error("Failed to save customer contact");
+      throw new Error(
+        `Failed to save customer contact: ${response.status} ${responseText}`
+      );
     }
 
-    // Process the response as needed
-    const result = await response.json();
+    // Parse the response if it's JSON
+    const result = response.headers
+      .get("content-type")
+      ?.includes("application/json")
+      ? JSON.parse(responseText)
+      : responseText;
+
     console.log("Customer contact saved:", result);
 
-    // Optionally, show a success message (for example via a snackbar)
-    // Reset the form state if needed:
+    // Add the new contact to the local array
+    if (result.id) {
+      customerContactPerson.value.push(result);
+    }
+
+    // Show success message
+    snackbar.value = {
+      show: true,
+      message: "Customer contact created successfully!",
+      color: "success",
+    };
+
+    // Reset the form
     newCustomerContact.value = {
       firstName: "",
       lastName: "",
@@ -1046,85 +1129,105 @@ async function saveCustomerContact() {
       phone: "",
     };
     newCustomerContactVisible.value = false;
+
+    // Refresh the contact list
     await fetchCustomerContact();
   } catch (error) {
     console.error("Error saving customer contact:", error);
-    // Optionally, show an error message
+    snackbar.value = {
+      show: true,
+      message: "Failed to save customer contact: " + error.message,
+      color: "error",
+    };
   }
 }
 
 async function save() {
   try {
-    const payload = {
-      id: editedItem.value.id,
-      projectNumber: editedItem.value.projectNumber,
-      name: editedItem.value.name,
-      description: editedItem.value.description,
-      startDate: editedItem.value.startDate,
-      endDate: editedItem.value.endDate,
-      priority: editedItem.value.priority,
-      statusId: editedItem.value.statusId,
-      serviceId: editedItem.value.serviceId,
-      customerId: editedItem.value.customerId,
-      employeeId: editedItem.value.employeeId,
-      Status:
-        status.value.find((s) => s.id === editedItem.value.statusId) || {},
-      Service:
-        service.value.find((s) => s.id === editedItem.value.serviceId) || {},
-      Customers:
-        customer.value.find((c) => c.id === editedItem.value.customerId) || {},
-      Employee:
-        employee.value.find((e) => e.id === editedItem.value.employeeId) || {},
-    };
-
     let response;
     if (editedIndex.value > -1) {
       // Update existing project
+      const payload = {
+        id: editedItem.value.id,
+        projectNumber: editedItem.value.projectNumber,
+        name: editedItem.value.name,
+        description: editedItem.value.description,
+        startDate: editedItem.value.startDate,
+        endDate: editedItem.value.endDate,
+        priority: editedItem.value.priority,
+        statusId: Number(editedItem.value.statusId),
+        customerId: Number(editedItem.value.customerId),
+        employeeId: Number(editedItem.value.employeeId),
+        serviceId: Number(editedItem.value.serviceId),
+      };
+
+      console.log("Update Payload:", payload);
       response = await fetch("http://192.168.1.6:5000/api/projects", {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
       });
-      if (response.status === 409) {
-        snackbar.value = {
-          show: true,
-          message: "Project already exists",
-          color: "error",
-        };
-        return;
+
+      const responseText = await response.text();
+      console.log("Response Status:", response.status);
+      console.log("Response Headers:", Object.fromEntries(response.headers));
+      console.log("Response Body:", responseText);
+
+      if (!response.ok) {
+        throw new Error(`Update failed: ${response.status} ${responseText}`);
       }
-      if (!response.ok) throw new Error("Update failed");
-      snackbar.value = {
-        show: true,
-        message: "Project updated successfully!",
-        color: "success",
-      };
     } else {
       // Create new project
+      const payload = {
+        projectNumber: crypto.randomUUID(),
+        name: editedItem.value.name,
+        description: editedItem.value.description,
+        startDate: editedItem.value.startDate,
+        endDate: editedItem.value.endDate,
+        priority: editedItem.value.priority,
+        statusId: Number(editedItem.value.statusId),
+        customerId: Number(editedItem.value.customerId),
+        employeeId: Number(editedItem.value.employeeId),
+        serviceId: Number(editedItem.value.serviceId),
+      };
+
       response = await fetch("http://192.168.1.6:5000/api/projects", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
       });
-      if (response.status === 409) {
-        snackbar.value = {
-          show: true,
-          message: "Project already exists",
-          color: "error",
-        };
-        return;
-      }
-      if (!response.ok) throw new Error("Create failed");
+    }
+    if (response.status === 409) {
       snackbar.value = {
         show: true,
-        message: "Project created successfully!",
-        color: "success",
+        message: "Project already exists",
+        color: "error",
       };
+      return;
     }
+    if (!response.ok) {
+      throw new Error(
+        editedIndex.value > -1 ? "Update failed" : "Create failed"
+      );
+    }
+    snackbar.value = {
+      show: true,
+      message:
+        editedIndex.value > -1
+          ? "Project updated successfully!"
+          : "Project created successfully!",
+      color: "success",
+    };
+
     await fetchProjects();
     close();
   } catch (error) {
     console.error("Error:", error);
+    snackbar.value = {
+      show: true,
+      message: "Operation failed: " + error.message,
+      color: "error",
+    };
   }
 }
 

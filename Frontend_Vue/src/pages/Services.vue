@@ -432,7 +432,6 @@ const snackbar = ref({
 
 async function save() {
   try {
-    // Build payload with proper types
     const payload = {
       ...editedItem.value,
       startupPrice: Number(editedItem.value.startupPrice),
@@ -455,7 +454,7 @@ async function save() {
     payload.employee = employeeObj ? { ...employeeObj } : null;
 
     if (editedIndex.value > -1) {
-      // Update existing service without appending the id to the URL
+
       const response = await fetch("http://192.168.1.6:5000/api/services", {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
