@@ -15,7 +15,10 @@ builder.Services.AddOpenApi();
 
 
 // Register DbContext
-builder.Services.AddDbContext<AppDbContext>(x => x.UseNpgsql(builder.Configuration.GetConnectionString("PostgreSQL")));
+var connectionString = builder.Configuration.GetConnectionString("PostgreSQL")
+                      ?? Environment.GetEnvironmentVariable("PostgreSQL");
+
+builder.Services.AddDbContext<AppDbContext>(x => x.UseNpgsql(connectionString));
 
 // Register Repositories
 builder.Services.AddScoped<IEmployeeRepository, EmployeeRespository>();
