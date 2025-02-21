@@ -18,7 +18,7 @@
     }"
   >
     <v-container>
-      <v-card flat class="elevation">
+      <v-card flat class="elevation-5 my-10 mx-10">
         <template v-if="isLoading">
           <!-- Skeleton loader for table data -->
           <v-skeleton-loader type="table" class="mx-4 my-4"></v-skeleton-loader>
@@ -217,6 +217,13 @@
 
 <script setup>
 import { ref, computed, onMounted, watch } from "vue";
+import { fetchRoles } from "@/endpoints/rolesEndpoint.js";
+import {
+  fetchEmployees as fetchEmployeesApi,
+  createEmployee,
+  updateEmployee,
+  deleteEmployee,
+} from "@/endpoints/employeeEndpoint.js";
 
 const expanded = ref(false);
 const isLoading = ref(true);
@@ -227,6 +234,7 @@ const roles = ref([]);
 const employees = ref([]);
 const editedIndex = ref(-1);
 const delay = ref(5000);
+const timeout = ref(null);
 
 const headers = [
   { title: "ID", key: "id" },
@@ -259,24 +267,22 @@ const defaultItem = {
   roleId: null,
 };
 
+const snackbar = ref({
+  show: false,
+  message: "",
+  color: "error",
+});
+
 const formTitle = computed(() => {
   return editedIndex.value === -1 ? "New Employee" : "Edit Employee";
 });
 
+// #region API calls
+
 async function fetchEmployees() {
   try {
-    const response = await fetch(
-      `http://192.168.1.6:5000/api/employees?search=${searchTerm.value}`
-    );
-    if (!response.ok) throw new Error("Failed to fetch employees");
-
-    const data = await response.json();
-    employees.value = data.map((emp) => ({
-      ...emp,
-      roleName: emp.roles ? emp.roles.roleName : "Unknown",
-    }));
-
-    // Reset delay and hide the snackbar on success
+    const currentSearch = searchTerm.value; // Store current search term
+    employees.value = await fetchEmployeesApi(currentSearch);
     delay.value = 5000;
     isLoading.value = false;
     snackbar.value.show = false;
@@ -284,28 +290,82 @@ async function fetchEmployees() {
     console.error("Error fetching employees:", error);
     snackbar.value = {
       show: true,
-      message: `failed connection to system - Retrying in ${
+      message: `Failed connection to system - Retrying in ${
         delay.value / 1000
       } seconds...`,
       color: "error",
     };
-    // Retry after delay and increase delay for consecutive failures
-    setTimeout(fetchEmployees, delay.value);
+    setTimeout(() => fetchEmployees(), delay.value);
     delay.value += 5000;
   }
 }
 
-async function fetchRoles() {
+async function save(item) {
   try {
-    const response = await fetch("http://192.168.1.6:5000/api/roles");
-    if (!response.ok) throw new Error("Failed to fetch roles");
-    const data = await response.json();
-    roles.value = data;
+    if (item.contractStartDate === "") {
+      item.contractStartDate = null;
+    }
+
+    if (editedIndex.value > -1) {
+      await updateEmployee(editedItem.value);
+      snackbar.value = {
+        show: true,
+        message: "Employee updated successfully!",
+        color: "success",
+      };
+    } else {
+      await createEmployee(editedItem.value);
+      snackbar.value = {
+        show: true,
+        message: "Employee created successfully!",
+        color: "success",
+      };
+    }
+
+    await fetchEmployees();
+    close();
+  } catch (error) {
+    console.error("Error:", error);
+    snackbar.value = {
+      show: true,
+      message: error.message,
+      color: "error",
+    };
+  }
+}
+
+async function deleteItemConfirm() {
+  try {
+    await deleteEmployee(editedItem.value.id);
+    snackbar.value = {
+      show: true,
+      message: "Employee was deleted successfully!",
+      color: "success",
+    };
+    await fetchEmployees();
+    closeDelete();
+  } catch (error) {
+    console.error("Error:", error);
+    snackbar.value = {
+      show: true,
+      message: error.message,
+      color: "error",
+    };
+  }
+}
+
+// Replace fetchRoles function
+async function loadRoles() {
+  try {
+    roles.value = await fetchRoles();
   } catch (error) {
     console.error("Error fetching roles:", error);
   }
 }
 
+// #endregion
+
+// #region handler functions
 function editItem(item) {
   editedIndex.value = employees.value.indexOf(item);
   editedItem.value = Object.assign({}, item);
@@ -316,29 +376,6 @@ function deleteItem(item) {
   editedIndex.value = employees.value.indexOf(item);
   editedItem.value = Object.assign({}, item);
   dialogDelete.value = true;
-}
-
-async function deleteItemConfirm() {
-  try {
-    const response = await fetch(
-      `http://192.168.1.6:5000/api/employees/${editedItem.value.id}`,
-      {
-        method: "DELETE",
-      }
-    );
-    snackbar.value = {
-      show: true,
-      message: "Employee was deleted successfully!",
-      color: "success",
-    };
-
-    if (!response.ok) throw new Error("Delete failed");
-
-    await fetchEmployees();
-    closeDelete();
-  } catch (error) {
-    console.error("Error:", error);
-  }
 }
 
 function close() {
@@ -353,78 +390,23 @@ function closeDelete() {
   editedIndex.value = -1;
 }
 
-const snackbar = ref({
-  show: false,
-  message: "",
-  color: "error",
-});
-
-async function save(item) {
-  try {
-    if (item.contractStartDate === "") {
-      item.contractStartDate = null;
-    }
-    if (editedIndex.value > -1) {
-      // Update existing
-      const response = await fetch("http://192.168.1.6:5000/api/employees", {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(editedItem.value),
-      });
-
-      if (response.status === 409) {
-        snackbar.value = {
-          show: true,
-          message: "Email already exists",
-          color: "error",
-        };
-        return;
-      }
-
-      if (!response.ok) throw new Error("Update failed");
-      snackbar.value = {
-        show: true,
-        message: "Employee updated successfully!",
-        color: "success",
-      };
-    } else {
-      // Create new
-      const response = await fetch("http://192.168.1.6:5000/api/employees", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(editedItem.value),
-      });
-
-      if (response.status === 409) {
-        snackbar.value = {
-          show: true,
-          message: "Email already exists",
-          color: "error",
-        };
-        return;
-      }
-
-      if (!response.ok) throw new Error("Create failed");
-
-      snackbar.value = {
-        show: true,
-        message: "Employee created successfully!",
-        color: "success",
-      };
-    }
-    await fetchEmployees();
-    close();
-  } catch (error) {
-    console.error("Error:", error);
-  }
-}
+// #endregion
 
 watch(searchTerm, () => {
   fetchEmployees();
 });
 
 onMounted(async () => {
-  await fetchRoles();
-  await fetchEmployees();
+  try {
+    isLoading.value = true;
+    await loadRoles();
+    if (!searchTerm.value) {
+      employees.value = await fetchEmployeesApi("");
+    }
+  } catch (error) {
+    console.error("Error in initial load:", error);
+  } finally {
+    isLoading.value = false;
+  }
 });
 </script>

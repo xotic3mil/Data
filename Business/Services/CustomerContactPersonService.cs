@@ -6,6 +6,7 @@ using Data.Interfaces;
 using Data.Repositories;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -36,6 +37,7 @@ namespace Business.Services
             catch (Exception ex)
             {
                 await _customerContactPersonRepository.RollbackTransactionAsync();
+                Debug.WriteLine(ex.Message);
                 return null!;
             }
             return CustomerContactPersonFactory.Create(customerContactPersonEntity);
@@ -54,6 +56,7 @@ namespace Business.Services
             catch (Exception ex)
             {
                 await _customerContactPersonRepository.RollbackTransactionAsync();
+                Debug.WriteLine(ex.Message);
                 return false;
             }
         }
@@ -90,6 +93,7 @@ namespace Business.Services
             catch (Exception ex)
             {
                 await _customerContactPersonRepository.RollbackTransactionAsync();
+                Debug.WriteLine(ex.Message);
                 return null!;
             }
             return CustomerContactPersonFactory.Create(customerContactPersonEntity);

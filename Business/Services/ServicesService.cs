@@ -4,6 +4,7 @@ using Business.Interfaces;
 using Business.Models;
 using Data.Interfaces;
 using Data.Repositories;
+using System.Diagnostics;
 
 namespace Business.Services;
 
@@ -32,6 +33,7 @@ public class ServicesService(IServiceRepository serviceRepository) : IServicesSe
         catch (Exception ex)
         {
             await _serviceRepository.RollbackTransactionAsync();
+            Debug.WriteLine(ex.Message);
             return null!;
         }
             return ServiceFactory.Create(serviceEntity);
@@ -53,6 +55,7 @@ public class ServicesService(IServiceRepository serviceRepository) : IServicesSe
         catch (Exception ex) 
         {
             await _serviceRepository.RollbackTransactionAsync();
+            Debug.WriteLine(ex.Message);
             return false;
         }
         
@@ -85,6 +88,7 @@ public class ServicesService(IServiceRepository serviceRepository) : IServicesSe
         catch (Exception ex)
         {
             await _serviceRepository.RollbackTransactionAsync();
+            Debug.WriteLine(ex.Message);
             return null!;
         }
         return ServiceFactory.Create(serviceEntity);

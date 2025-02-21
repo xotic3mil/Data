@@ -14,7 +14,28 @@ public class EmployeeRespository(AppDbContext context) : BaseRepository<Employee
     {
         var employees = await _context.Employees
         .Include(e => e.RoleId)
+        .Include(e => e.Role)
         .ToListAsync();
+
+        return employees;
+    }
+
+    public async Task<IEnumerable<EmployeeEntity>> SearchEmployeesAsync(string? search)
+    {
+        var employees = await _context.Employees
+            .Include(e => e.Role)
+            .ToListAsync();
+
+        if (!string.IsNullOrEmpty(search))
+        {
+                employees = employees.Where(e =>
+                e.FirstName.Contains(search, StringComparison.OrdinalIgnoreCase) ||
+                e.LastName.Contains(search, StringComparison.OrdinalIgnoreCase) ||
+                e.Phone.Contains(search, StringComparison.OrdinalIgnoreCase) ||
+                e.Role.RoleName.Contains(search, StringComparison.OrdinalIgnoreCase) ||
+                e.Email.Contains(search, StringComparison.OrdinalIgnoreCase)).ToList();
+
+        }
 
         return employees;
     }

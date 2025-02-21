@@ -42,55 +42,6 @@ export async function fetchEmployees() {
   }
 }
 
-export async function createEmployee(employee) {
-  try {
-    const response = await fetch(employeesUrl, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(employee),
-    });
-    if (response.status === 409) {
-      throw new Error("Employee already exists");
-    }
-    if (!response.ok) throw new Error("Creation failed");
-    return response.json();
-  } catch (error) {
-    console.error("Error in createEmployee:", error);
-    throw error;
-  }
-}
-
-export async function updateEmployee(employee) {
-  try {
-    const response = await fetch(rolesUrl, {
-      method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(employee),
-    });
-    if (response.status === 409) {
-      throw new Error("Employee already exists");
-    }
-    if (!response.ok) throw new Error("Update failed");
-    return response.json();
-  } catch (error) {
-    console.error("Error in updateEmployee:", error);
-    throw error;
-  }
-}
-
-export async function deleteEmployee(id) {
-  try {
-    const response = await fetch(`${employeesUrl}/${id}`, {
-      method: "DELETE",
-    });
-    if (!response.ok) throw new Error("Delete failed");
-    return response.json();
-  } catch (error) {
-    console.error("Error in deleteEmployee:", error);
-    throw error;
-  }
-}
-
 export async function fetchServices() {
   try {
     const response = await fetch("http://192.168.1.6:5000/api/services");
@@ -137,6 +88,18 @@ export async function fetchCustomers() {
     throw error;
   }
 }
+
+export async function fetchProjects() {
+  try {
+    const response = await fetch("http://192.168.1.6:5000/api/projects");
+    if (!response.ok) throw new Error("Failed to fetch customers");
+    return response.json();
+  } catch (error) {
+    console.error("Error in fetchCustomers:", error);
+    throw error;
+  }
+}
+
 
 
 

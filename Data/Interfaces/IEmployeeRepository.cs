@@ -8,5 +8,7 @@ public interface IEmployeeRepository : IBaseRepository<EmployeeEntity>
 
     Task <IEnumerable<EmployeeEntity>> GetEmployeesByRole(int roleId);
 
+    Task<IEnumerable<EmployeeEntity>> SearchEmployeesAsync(string? search);
+
 
 }

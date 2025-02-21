@@ -18,7 +18,7 @@
     }"
   >
     <v-container>
-      <v-card flat class="elevation">
+      <v-card flat class="elevation-5 my-10 mx-10">
         <template v-if="isLoading">
           <!-- Skeleton loader for table data -->
           <v-skeleton-loader type="table" class="mx-4 my-4"></v-skeleton-loader>
@@ -729,6 +729,14 @@
 
 <script setup>
 import { ref, computed, onMounted, watchEffect } from "vue";
+import {
+  fetchProjects as fetchProjectsApi,
+  updateProject,
+  updateProjectPayload,
+  createProject,
+  createProjectPayload,
+  deleteProject,
+} from "@/endpoints/projectEndpoint.js";
 
 import {
   fetchStatuses,
@@ -738,7 +746,7 @@ import {
   fetchCurrencies,
   fetchUnits,
   fetchCustomers,
-} from "@/services/apiService";
+} from "@/endpoints/apiService";
 
 const expanded = ref(false);
 const isLoading = ref(true);
@@ -879,40 +887,24 @@ const formTitle = computed(() => {
 
 async function fetchProjects() {
   try {
-    const response = await fetch(
-      `http://192.168.1.6:5000/api/projects?search=${searchTerm.value}`
+    projects.value = await fetchProjectsApi(
+      searchTerm.value,
+      status.value,
+      customer.value,
+      employee.value,
+      service.value
     );
-    if (!response.ok) throw new Error("Failed to fetch projects");
-
-    const data = await response.json();
-    console.log("Fetched projects:", data);
-    projects.value = data.map((proj) => {
-      const cust = customer.value.find((c) => c.id === proj.customerId);
-      const emp = employee.value.find((e) => e.id === proj.employeeId);
-      return {
-        ...proj,
-        status: status.value.find((s) => s.id === proj.statusId)?.status || "",
-        service:
-          service.value.find((s) => s.id === proj.serviceId)?.serviceName || "",
-        serviceCurrency: service.currency || "",
-        serviceUnit: service.unit || "",
-        // Keep the entire customer object so we can access nested properties
-        customers: cust || {},
-        employee: emp || {},
-      };
-    });
     delay.value = 5000;
     isLoading.value = false;
   } catch (error) {
     console.error("Error fetching projects:", error);
     snackbar.value = {
       show: true,
-      message: `failed connection to system - Retrying in ${
+      message: `Failed connection to system - Retrying in ${
         delay.value / 1000
       } seconds...`,
       color: "error",
     };
-    // Retry after delay and increase delay for consecutive failures
     setTimeout(fetchProjects, delay.value);
     delay.value += 5000;
   }
@@ -932,24 +924,23 @@ function deleteItem(item) {
 
 async function deleteItemConfirm() {
   try {
-    const response = await fetch(
-      `http://192.168.1.6:5000/api/projects/${editedItem.value.id}`,
-      {
-        method: "DELETE",
-      }
-    );
+    await deleteProject(editedItem.value.id);
+
     snackbar.value = {
       show: true,
       message: "Project was deleted successfully!",
       color: "error",
     };
 
-    if (!response.ok) throw new Error("Delete failed");
-
     await fetchProjects();
     closeDelete();
   } catch (error) {
     console.error("Error:", error);
+    snackbar.value = {
+      show: true,
+      message: "Delete failed: " + error.message,
+      color: "error",
+    };
   }
 }
 
@@ -1026,6 +1017,7 @@ async function saveService() {
     };
   }
 }
+
 async function saveCustomer() {
   try {
     const customerPayload = {
@@ -1146,103 +1138,20 @@ async function saveCustomerContact() {
 
 async function save() {
   try {
-    let response;
     if (editedIndex.value > -1) {
       // Update existing project
-      const statusObj = status.value.find(
-        (s) => s.id === Number(editedItem.value.statusId)
+      const payload = updateProjectPayload(
+        editedItem.value,
+        status.value,
+        customer.value,
+        employee.value,
+        service.value
       );
-      const customerObj = customer.value.find(
-        (c) => c.id === Number(editedItem.value.customerId)
-      );
-      const employeeObj = employee.value.find(
-        (e) => e.id === Number(editedItem.value.employeeId)
-      );
-      const serviceObj = service.value.find(
-        (s) => s.id === Number(editedItem.value.serviceId)
-      );
-
-      // Get the service employee with roles
-      const serviceEmployee = employee.value.find(
-        (e) => e.id === serviceObj?.employeeId
-      );
-
-      // Update existing project with complete nested objects
-      const payload = {
-        id: editedItem.value.id,
-        projectNumber: editedItem.value.projectNumber,
-        name: editedItem.value.name,
-        description: editedItem.value.description,
-        startDate: editedItem.value.startDate,
-        endDate: editedItem.value.endDate,
-        priority: editedItem.value.priority,
-        statusId: Number(editedItem.value.statusId),
-        customerId: Number(editedItem.value.customerId),
-        employeeId: Number(editedItem.value.employeeId),
-        serviceId: Number(editedItem.value.serviceId),
-        status: statusObj,
-        customers: customerObj,
-        employee: employeeObj,
-        service: {
-          ...serviceObj,
-          employee: {
-            ...serviceEmployee,
-            roles: serviceEmployee?.roles || {
-              id: 11,
-              roleName: "Product Owner",
-            },
-          },
-        },
-      };
-
-      console.log("Update Payload:", payload);
-      response = await fetch("http://192.168.1.6:5000/api/projects", {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-      });
-
-      const responseText = await response.text();
-      console.log("Response Status:", response.status);
-      console.log("Response Headers:", Object.fromEntries(response.headers));
-      console.log("Response Body:", responseText);
-
-      if (!response.ok) {
-        throw new Error(`Update failed: ${response.status} ${responseText}`);
-      }
+      await updateProject(payload);
     } else {
       // Create new project
-      const payload = {
-        projectNumber: crypto.randomUUID(),
-        name: editedItem.value.name,
-        description: editedItem.value.description,
-        startDate: editedItem.value.startDate,
-        endDate: editedItem.value.endDate,
-        priority: editedItem.value.priority,
-        statusId: Number(editedItem.value.statusId),
-        customerId: Number(editedItem.value.customerId),
-        employeeId: Number(editedItem.value.employeeId),
-        serviceId: Number(editedItem.value.serviceId),
-      };
-
-      response = await fetch("http://192.168.1.6:5000/api/projects", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-      });
-    }
-    if (response.status === 409) {
-      snackbar.value = {
-        show: true,
-        message: "Project already exists",
-        color: "error",
-      };
-      return;
-    }
-    if (!response.ok) {
-      throw new Error(
-        editedIndex.value > -1 ? "Update failed" : "Create failed"
-      );
+      const payload = createProjectPayload(editedItem.value);
+      await createProject(payload);
     }
     snackbar.value = {
       show: true,
@@ -1252,7 +1161,6 @@ async function save() {
           : "Project created successfully!",
       color: "success",
     };
-
     await fetchProjects();
     close();
   } catch (error) {
@@ -1305,5 +1213,19 @@ defineExpose({
   text-overflow: unset;
   word-break: break-word;
   max-width: 60%;
+}
+.stat-card-skeleton {
+  background: linear-gradient(90deg, #2c2c2c 25%, #3c3c3c 50%, #2c2c2c 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
 }
 </style>

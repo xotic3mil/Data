@@ -1,5 +1,5 @@
 <template>
-  <v-container fluid class="dashboard-container">
+  <v-container fluid>
     <v-container>
       <v-row default>
         <v-col
@@ -19,8 +19,12 @@
               <v-icon size="36" color="primary">{{ stat.icon }}</v-icon>
             </v-card-title>
             <v-card-text class="text-center">
-              <div class="display-1 font-weight-bold">{{ stat.value }}</div>
-              <div class="subtitle-1">{{ stat.title }}</div>
+              <div style="font-size: 1rem" class="display-1font-weight-bold">
+                {{ stat.value }}
+              </div>
+              <div style="font-size: 1rem" class="subtitle-1">
+                {{ stat.title }}
+              </div>
             </v-card-text>
           </v-card>
         </v-col>
@@ -31,7 +35,7 @@
 
 <script setup>
 import { ref, onMounted, computed } from "vue";
-import { fetchStats } from "../services/apiService.js";
+import { fetchStats } from "../endpoints/apiService.js";
 
 const stats = ref({
   employees: 0,
@@ -39,11 +43,6 @@ const stats = ref({
   projects: 0,
   customers: 0,
   revenue: 0,
-});
-
-const sparklineData = ref({
-  employees: [3, 4, 5, 6, 7, 7, 9],
-  projects: [1, 0, 3, 1, 7, 8, 9],
 });
 
 const formattedRevenue = computed(() => {
@@ -60,6 +59,7 @@ const statsList = computed(() => [
     icon: "mdi-account-group",
     route: "/employees",
   },
+  
   {
     title: "Services",
     value: stats.value.services,
@@ -82,6 +82,7 @@ const statsList = computed(() => [
     title: "Total Monthly Revenue",
     value: formattedRevenue.value,
     icon: "mdi-currency-usd",
+    route: "/",
   },
 ]);
 
@@ -95,15 +96,6 @@ onMounted(async () => {
 </script>
 
 <style scoped>
-.dashboard-container {
-  background: linear-gradient(180deg, #121212, #363636, #555555);
-  min-height: 100vh;
-}
-
-.mt-10 {
-  margin-top: 10rem;
-}
-
 .stat-card {
   transition: transform 0.3s ease, box-shadow 0.3s ease;
   cursor: pointer;

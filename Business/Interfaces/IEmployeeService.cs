@@ -18,5 +18,7 @@ public interface IEmployeeService
 
     public Task<bool> DeleteEmployee(int id);
 
+    public Task<IEnumerable<Employee>> SearchEmployeesAsync(string? search);
+
 
 }

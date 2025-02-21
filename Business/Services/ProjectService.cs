@@ -3,6 +3,7 @@ using Business.Factories;
 using Business.Interfaces;
 using Business.Models;
 using Data.Interfaces;
+using System.Diagnostics;
 
 namespace Business.Services;
 
@@ -31,6 +32,7 @@ public class ProjectService(IProjectRespository projectRespository) : IProjectsS
         catch (Exception ex)
         {
             await _projectRespository.RollbackTransactionAsync();
+            Debug.WriteLine(ex.Message);
             return null!;
         }
         return ProjectFactory.Create(projectEntity);
@@ -75,6 +77,7 @@ public class ProjectService(IProjectRespository projectRespository) : IProjectsS
         catch (Exception ex)
         {
             await _projectRespository.RollbackTransactionAsync();
+            Debug.WriteLine(ex.Message);
             return null!;
         }
         return ProjectFactory.Create(projectEntity);
@@ -94,6 +97,7 @@ public class ProjectService(IProjectRespository projectRespository) : IProjectsS
         catch (Exception ex)
         {
             await _projectRespository.RollbackTransactionAsync();
+            Debug.WriteLine(ex.Message);
             return false;
         }
 

@@ -18,7 +18,7 @@
     }"
   >
     <v-container>
-      <v-card flat class="elevation">
+      <v-card flat class="elevation-5 my-10 mx-10">
         <template v-if="isLoading">
           <!-- Skeleton loader for table data -->
           <v-skeleton-loader type="table" class="mx-4 my-4"></v-skeleton-loader>

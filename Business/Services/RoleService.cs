@@ -5,6 +5,7 @@ using Business.Models;
 using Data.Entities;
 using Data.Interfaces;
 using Data.Repositories;
+using System.Diagnostics;
 
 namespace Business.Services
 {
@@ -33,6 +34,7 @@ namespace Business.Services
             catch (Exception ex)
             {
                 await _roleRepository.RollbackTransactionAsync();
+                Debug.WriteLine(ex.Message);
                 return null!;
             }
             return RoleFactory.Create(roleEntity);
@@ -52,6 +54,7 @@ namespace Business.Services
             catch (Exception ex)
             {
                 await _roleRepository.RollbackTransactionAsync();
+                Debug.WriteLine(ex.Message);
                 return null!;
             }
             return RoleFactory.Create(roleEntity);
@@ -70,6 +73,7 @@ namespace Business.Services
             catch (Exception ex)
             {
                 await _roleRepository.RollbackTransactionAsync();
+                Debug.WriteLine(ex.Message);
                 return false;
             }
         }

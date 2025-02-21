@@ -37,6 +37,14 @@ public class EmployeesController(IEmployeeService employeeService) : ControllerB
         return Ok(result);
     }
 
+    [HttpGet("search")]
+    public async Task<IActionResult> SearchAll([FromQuery] string? search = null)
+    {
+
+        var result = await _employeeService.SearchEmployeesAsync(search);
+        return Ok(result);
+    }
+
     [HttpGet("{id}")]
     public async Task<IActionResult> Get(int id)
     {

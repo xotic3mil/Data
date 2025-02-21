@@ -1,17 +1,9 @@
 <template>
   <v-app-bar color="blue-grey-lighten-1" dark>
-    <v-toolbar-title
-      class="font-weight-thin text-decoration-underline"
-      style="font-size: xx-large"
+    <v-toolbar-title class="font-weight-thin" style="font-size: xx-large"
       >ProcrastiPlan
     </v-toolbar-title>
-    <template v-slot:append>
-      <v-btn icon="mdi-heart"></v-btn>
-
-      <v-btn icon="mdi-magnify"></v-btn>
-
-      <v-btn icon="mdi-dots-vertical"></v-btn>
-    </template>
+    <template v-slot:append> </template>
   </v-app-bar>
 
   <v-navigation-drawer v-model="drawer" :width="250" floating permanent>
@@ -76,5 +68,9 @@ export default {
 <style scoped>
 .v-navigation-drawer {
   z-index: 1006 !important;
+}
+
+.v-app-bar {
+  z-index: 1005 !important;
 }
 </style>

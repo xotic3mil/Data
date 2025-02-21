@@ -4,6 +4,7 @@ using Business.Interfaces;
 using Business.Models;
 using Data.Interfaces;
 using Data.Repositories;
+using System.Diagnostics;
 
 namespace Business.Services;
 
@@ -32,6 +33,7 @@ public class StatusTypeService(IStatusTypeRepository statusTypeRepository) : ISt
         catch (Exception ex)
         {
             await _statusTypeRepository.RollbackTransactionAsync();
+            Debug.WriteLine(ex.Message);
             return null!;
         }
         return StatusTypeFactory.Create(statusTypeEntity);
@@ -53,6 +55,7 @@ public class StatusTypeService(IStatusTypeRepository statusTypeRepository) : ISt
         catch (Exception ex)
         {
             await _statusTypeRepository.RollbackTransactionAsync();
+            Debug.WriteLine(ex.Message);
             return false;
         }
     }
@@ -82,6 +85,7 @@ public class StatusTypeService(IStatusTypeRepository statusTypeRepository) : ISt
         catch (Exception ex)
         {
             await _statusTypeRepository.RollbackTransactionAsync();
+            Debug.WriteLine(ex.Message);
             return null!;
         }
         return StatusTypeFactory.Create(statusEntity);

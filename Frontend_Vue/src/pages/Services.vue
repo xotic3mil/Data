@@ -18,7 +18,7 @@
     }"
   >
     <v-container>
-      <v-card flat class="elevation">
+      <v-card flat class="elevation-5 my-10 mx-10">
         <v-data-table
           v-model:selected="expanded"
           :headers="headers"
@@ -265,8 +265,15 @@
 
 <script setup>
 import { ref, computed, onMounted, watchEffect } from "vue";
-import { renderDescription } from "@/services/markdownService.js";
-import { fetchEmployees } from "@/services/apiService.js";
+import { renderDescription } from "@/endpoints/markdownService.js";
+import { fetchEmployees } from "@/endpoints/apiService.js";
+import {
+  fetchServices as fetchServicesApi,
+  createNewService,
+  updateExistingService,
+  deleteService,
+  checkServiceUsage,
+} from "@/endpoints/serviceEndpoint.js";
 
 const expanded = ref(false);
 const dialog = ref(false);
@@ -322,38 +329,19 @@ const formTitle = computed(() =>
 
 async function fetchServices() {
   try {
-    const response = await fetch(`http://192.168.1.6:5000/api/services?`);
-    if (!response.ok) throw new Error("Failed to fetch services");
-    const rawServices = await response.json();
-    // Map each service object to include the actual unit and currency values
-    services.value = rawServices.map((service) => {
-      const emp = employees.value.find((e) => e.id === service.employeeId);
-      const unitObj = units.value.find((u) => u.id === service.unitId);
-      const currencyObj = currencies.value.find(
-        (c) => c.id === service.currencyId
-      );
-      return {
-        ...service,
-        unit: unitObj ? unitObj.unit : "",
-        employees: emp || {},
-        currency: currencyObj ? currencyObj.currency : "",
-
-        formattedPrice: new Intl.NumberFormat("sv-SE", {
-          style: "currency",
-          currency: "SEK",
-          minimumFractionDigits: 2,
-          maximumFractionDigits: 2,
-        }).format(service.price),
-        formattedStartupPrice: new Intl.NumberFormat("sv-SE", {
-          style: "currency",
-          currency: "SEK",
-          minimumFractionDigits: 2,
-          maximumFractionDigits: 2,
-        }).format(service.startupPrice),
-      };
-    });
+    services.value = await fetchServicesApi(
+      employees.value,
+      units.value,
+      currencies.value
+    );
   } catch (error) {
     console.error("Error fetching services:", error);
+    snackbar.value = {
+      show: true,
+      message: "Failed to fetch services",
+      color: "error",
+      timeout: 5000,
+    };
   }
 }
 
@@ -391,24 +379,40 @@ function deleteItem(item) {
 
 async function deleteItemConfirm() {
   try {
-    const response = await fetch(
-      `http://192.168.1.6:5000/api/services/${editedItem.value.id}`,
-      {
-        method: "DELETE",
-      }
-    );
-    snackbar.value = {
-      show: true,
-      message: "Service was deleted successfully!",
-      color: "success",
-    };
+    const serviceId = editedItem.value.id;
+    console.log("Checking service usage for ID:", serviceId);
 
-    if (!response.ok) throw new Error("Delete failed");
+    const matchingProjects = await checkServiceUsage(serviceId);
+    console.log("Matching projects:", matchingProjects);
 
-    await fetchServices();
+    if (!matchingProjects || matchingProjects.length === 0) {
+      await deleteService(serviceId);
+      snackbar.value = {
+        show: true,
+        message: "Service was deleted successfully!",
+        color: "success",
+      };
+      await fetchServices();
+    } else {
+      snackbar.value = {
+        show: true,
+        message: `Cannot delete service: It is used in ${
+          matchingProjects.length
+        } project${matchingProjects.length === 1 ? "" : "s"}`,
+        color: "warning",
+        timeout: 5000,
+      };
+    }
     closeDelete();
   } catch (error) {
-    console.error("Error:", error);
+    console.error("Delete error:", error);
+    snackbar.value = {
+      show: true,
+      message: typeof error === "string" ? error : error.message,
+      color: "error",
+      timeout: 5000,
+    };
+    closeDelete();
   }
 }
 
@@ -432,78 +436,41 @@ const snackbar = ref({
 
 async function save() {
   try {
-    const payload = {
-      ...editedItem.value,
-      startupPrice: Number(editedItem.value.startupPrice),
-      price: Number(editedItem.value.price),
-      unitId: Number(editedItem.value.unitId),
-      currencyId: Number(editedItem.value.currencyId),
-      employeeId: Number(editedItem.value.employeeId),
+    if (editedIndex.value > -1) {
+      await updateExistingService(
+        editedItem.value,
+        units.value,
+        currencies.value,
+        employees.value
+      );
+    } else {
+      await createNewService(
+        editedItem.value,
+        units.value,
+        currencies.value,
+        employees.value
+      );
+    }
+
+    snackbar.value = {
+      show: true,
+      message:
+        editedIndex.value > -1
+          ? "Service updated successfully!"
+          : "Service created successfully!",
+      color: "success",
     };
 
-    // Look up nested objects
-    const unitObj = units.value.find((u) => u.id === payload.unitId);
-    const currencyObj = currencies.value.find(
-      (c) => c.id === payload.currencyId
-    );
-    const employeeObj = employees.value.find(
-      (e) => e.id === payload.employeeId
-    );
-    payload.units = unitObj ? { ...unitObj } : null;
-    payload.currencies = currencyObj ? { ...currencyObj } : null;
-    payload.employee = employeeObj ? { ...employeeObj } : null;
-
-    if (editedIndex.value > -1) {
-
-      const response = await fetch("http://192.168.1.6:5000/api/services", {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-      });
-
-      if (response.status === 409) {
-        snackbar.value = {
-          show: true,
-          message: "Service already exists",
-          color: "error",
-        };
-        return;
-      }
-      if (!response.ok) throw new Error("Update failed");
-
-      snackbar.value = {
-        show: true,
-        message: "Service updated successfully!",
-        color: "success",
-      };
-    } else {
-      // Create a new service
-      const response = await fetch("http://192.168.1.6:5000/api/services", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-      });
-
-      if (response.status === 409) {
-        snackbar.value = {
-          show: true,
-          message: "Service already exists",
-          color: "error",
-        };
-        return;
-      }
-      if (!response.ok) throw new Error("Create failed");
-
-      snackbar.value = {
-        show: true,
-        message: "Service created successfully!",
-        color: "success",
-      };
-    }
     await fetchServices();
     close();
   } catch (error) {
     console.error("Error:", error);
+    snackbar.value = {
+      show: true,
+      message: error.message,
+      color: "error",
+      timeout: 5000,
+    };
   }
 }
 

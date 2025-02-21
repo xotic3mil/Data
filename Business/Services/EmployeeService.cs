@@ -3,6 +3,7 @@ using Business.Factories;
 using Business.Interfaces;
 using Business.Models;
 using Data.Interfaces;
+using System.Diagnostics;
 
 namespace Business.Services;
 
@@ -31,6 +32,7 @@ public class EmployeeService(IEmployeeRepository employeeRepository) : IEmployee
         catch (Exception ex)
         {
             await _employeeRepository.RollbackTransactionAsync();
+            Debug.WriteLine(ex.Message);
             return null!;
         }
         return EmployeeFactory.Create(employeeEntity);
@@ -51,21 +53,16 @@ public class EmployeeService(IEmployeeRepository employeeRepository) : IEmployee
     public async Task<IEnumerable<Employee>> GetEmployees(string? search)
     {
         var employees = await _employeeRepository.GetAllAsync();
-
-
-        if (!string.IsNullOrEmpty(search))
-        {
-            var filteredEmployees = employees.Where(e =>
-                e.FirstName.Contains(search, StringComparison.OrdinalIgnoreCase) ||
-                e.LastName.Contains(search, StringComparison.OrdinalIgnoreCase) ||
-                e.Email.Contains(search, StringComparison.OrdinalIgnoreCase));
-
-            return filteredEmployees.Select(EmployeeFactory.Create);
-        }
-
         return employees.Select(EmployeeFactory.Create);
 
     }
+
+    public async Task<IEnumerable<Employee>> SearchEmployeesAsync(string? search)
+    {
+        var employees = await _employeeRepository.SearchEmployeesAsync(search);
+        return employees.Select(EmployeeFactory.Create);
+    }
+
 
     public async Task<Employee> UpdateEmployee(Employee employee)
     {
@@ -81,6 +78,7 @@ public class EmployeeService(IEmployeeRepository employeeRepository) : IEmployee
         catch (Exception ex)
         {
             await _employeeRepository.RollbackTransactionAsync();
+            Debug.WriteLine(ex.Message);
             return null!;
         }
         return EmployeeFactory.Create(employeeEntity);
@@ -100,6 +98,7 @@ public class EmployeeService(IEmployeeRepository employeeRepository) : IEmployee
         catch (Exception ex)
         {
             await _employeeRepository.RollbackTransactionAsync();
+            Debug.WriteLine(ex.Message);
             return false;
         }
     }
