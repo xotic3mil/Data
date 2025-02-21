@@ -176,7 +176,6 @@ onMounted(async () => {
             :items="roles"
             :sort-by="[{ key: 'id', order: 'asc' }]"
             item-value="id"
-            show-expand
             no-data-text="Please add new role(s)"
           >
             <template v-slot:top>

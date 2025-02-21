@@ -800,7 +800,7 @@ const headers = [
   { title: "Service", key: "service" },
   { title: "Customer", key: "customers" },
   { title: "Project Manager", key: "employee" },
-  { title: "Manage", key: "actions", sortable: false },
+  { title: "Manage", key: "actions", sortable: true },
 ];
 
 const newCustomerContact = ref({

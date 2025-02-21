@@ -25,6 +25,7 @@
           :items="services"
           :sort-by="[{ key: 'id', order: 'asc' }]"
           item-value="id"
+          :items-per-page="15"
           show-expand
           no-data-text="Please add new service(s)."
         >
@@ -195,17 +196,14 @@
 
                   <v-card-text>
                     <v-container>
-                      <!-- Project Details Section -->
                       <v-row>
                         <v-col cols="12" md="12">
                           <v-list>
-                            <v-list-item>
-                              <v-list-item-action> </v-list-item-action>
-                            </v-list-item>
+                            <!-- Description -->
                             <v-list-item>
                               <v-list-item-title class="font-weight-bold"
-                                >Description
-                              </v-list-item-title>
+                                >Description</v-list-item-title
+                              >
                               <div
                                 class="full-text"
                                 v-html="
@@ -213,15 +211,40 @@
                                 "
                               ></div>
                             </v-list-item>
+
+                            <!-- Product Manager -->
+                            <v-list-item>
+                              <v-list-item-title class="font-weight-bold"
+                                >Product Manager</v-list-item-title
+                              >
+                              <v-list-item-subtitle>
+                                {{ item.employee.firstName }}
+                                {{ item.employee.lastName }}
+                              </v-list-item-subtitle>
+                            </v-list-item>
+
+                            <!-- Pricing Details -->
+                            <v-list-item>
+                              <v-list-item-title class="font-weight-bold"
+                                >Start-Up Fee</v-list-item-title
+                              >
+                              <v-list-item-subtitle>{{
+                                item.formattedStartupPrice
+                              }}</v-list-item-subtitle>
+                            </v-list-item>
+
+                            <v-list-item>
+                              <v-list-item-title class="font-weight-bold"
+                                >Monthly Cost</v-list-item-title
+                              >
+                              <v-list-item-subtitle>
+                                {{ item.formattedPrice }} per
+                                {{ item.unit.unit }}
+                              </v-list-item-subtitle>
+                            </v-list-item>
                           </v-list>
                         </v-col>
-
-                        <v-col cols="12" md="6">
-                          <v-list two-line> </v-list>
-                        </v-col>
                       </v-row>
-
-                      <v-divider></v-divider>
                     </v-container>
                   </v-card-text>
                 </v-card>

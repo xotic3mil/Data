@@ -30,7 +30,6 @@
             :items="customers"
             :sort-by="[{ key: 'id', order: 'asc' }]"
             item-value="id"
-            show-expand
             no-data-text="Please add new customer(s)"
           >
             <template v-slot:expanded-row="{ columns, item }">

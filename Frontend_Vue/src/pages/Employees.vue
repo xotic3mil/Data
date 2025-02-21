@@ -30,24 +30,9 @@
             :items="employees"
             :sort-by="[{ key: 'id', order: 'asc' }]"
             item-value="id"
-            show-expand
+            :items-per-page="30"
             no-data-text="Please add new employee(s)"
           >
-            <template v-slot:expanded-row="{ columns, item }">
-              <tr>
-                <td :colspan="columns.length" class="pa-5">
-                  More info about {{ item.firstName }} Lorem ipsum dolor sit,
-                  amet consectetur adipisicing elit. Temporibus illum ea et
-                  officia, repudiandae mollitia! Nesciunt veritatis
-                  necessitatibus explicabo. Autem repellat expedita atque
-                  blanditiis minus culpa iure commodi omnis molestias! Lorem
-                  ipsum dolor sit, amet consectetur adipisicing elit. Temporibus
-                  illum ea et officia, repudiandae mollitia! Nesciunt veritatis
-                  necessitatibus explicabo. Autem repellat expedita atque
-                  blanditiis minus culpa iure commodi omnis molestias!
-                </td>
-              </tr>
-            </template>
             <template v-slot:top>
               <v-toolbar flat>
                 <v-toolbar-title>Employees</v-toolbar-title>
