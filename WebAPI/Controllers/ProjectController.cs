@@ -45,6 +45,13 @@ namespace WebAPI.Controllers
             return result != null ? Ok(result) : NotFound();
         }
 
+        [HttpGet("search")]
+        public async Task<IActionResult> SearchAll([FromQuery] string? search = null)
+        {
+            var result = await _projectsService.SearchProjectsAsync(search);
+            return Ok(result);
+        }
+
         [HttpPut]
         public async Task<IActionResult> Update(Projects projects)
         {

@@ -20,5 +20,7 @@ namespace Business.Interfaces
         public Task<Projects> UpdateProject(Projects projects);
 
         public Task<bool> DeleteProject(int id);
+
+        public Task<IEnumerable<Projects>> SearchProjectsAsync(string? search);
     }
 }

@@ -48,18 +48,12 @@ public class ProjectService(IProjectRespository projectRespository) : IProjectsS
     public async Task<IEnumerable<Projects>> GetProjects(string? search)
     {
         var projects = await _projectRespository.GetAllAsync();
+        return projects.Select(ProjectFactory.Create);
+    }
 
-        if (!string.IsNullOrEmpty(search))
-        {
-            var filteredProjects = projects.Where(p =>
-                p.Name.Contains(search, StringComparison.OrdinalIgnoreCase) ||
-                p.Description.Contains(search, StringComparison.OrdinalIgnoreCase) ||
-                p.Status.Status.Contains(search, StringComparison.OrdinalIgnoreCase) ||
-                p.Service.ServiceName.Contains(search, StringComparison.OrdinalIgnoreCase) ||
-                p.Priority.Contains(search, StringComparison.OrdinalIgnoreCase));
-
-            return filteredProjects.Select(ProjectFactory.Create);
-        }
+    public async Task<IEnumerable<Projects>> SearchProjectsAsync(string? search)
+    {
+        var projects = await _projectRespository.SearchProjectsAsync(search);
         return projects.Select(ProjectFactory.Create);
     }
 
