@@ -29,6 +29,10 @@
           show-expand
           no-data-text="Please add new service(s)."
         >
+          <template v-slot:item.index="{ index }">
+            {{ index + 1 }}
+          </template>
+
           <template v-slot:item.serviceDescription="{ item }">
             {{
               item.serviceDescription.length > 50
@@ -79,6 +83,8 @@
                           <v-textarea
                             v-model="editedItem.serviceDescription"
                             label="Service Description *"
+                            :rules="rules"
+                            counter
                           ></v-textarea>
                         </v-col>
                         <v-col cols="12" sm="12">
@@ -315,7 +321,7 @@ const filteredEmployees = computed(() => {
 });
 
 const headers = [
-  { title: "ID", key: "id" },
+  { title: "#", key: "index", align: "center" },
   { title: "Service Name", key: "serviceName" },
   { title: "Description", key: "serviceDescription" },
   { title: "Product Manager", key: "employee" },
@@ -511,4 +517,13 @@ onMounted(async () => {
 defineExpose({
   fetchServices,
 });
+</script>
+
+<script>
+export default {
+  data: () => ({
+    rules: [(v) => v.length <= 800 || "Max 800 characters"],
+    value: "Hello!",
+  }),
+};
 </script>

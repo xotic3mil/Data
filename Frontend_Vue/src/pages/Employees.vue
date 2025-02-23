@@ -33,6 +33,10 @@
             :items-per-page="30"
             no-data-text="Please add new employee(s)"
           >
+            <template v-slot:item.index="{ index }">
+              {{ index + 1 }}
+            </template>
+
             <template v-slot:top>
               <v-toolbar flat>
                 <v-toolbar-title>Employees</v-toolbar-title>
@@ -96,7 +100,8 @@
                           </v-col>
                           <v-col cols="12" sm="12">
                             <v-date-picker
-                              width="430"
+                              width="400px"
+                              variant="solo-filled"
                               type="date"
                               title="Contract Start Date"
                               v-model="editedItem.contractStartDate"
@@ -224,7 +229,7 @@ const editedIndex = ref(-1);
 const delay = ref(5000);
 
 const headers = [
-  { title: "ID", key: "id" },
+  { title: "#", key: "index", align: "center" },
   { title: "First Name", key: "firstName" },
   { title: "Last Name", key: "lastName" },
   { title: "Email", key: "email" },

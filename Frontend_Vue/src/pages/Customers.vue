@@ -32,6 +32,10 @@
             item-value="id"
             no-data-text="Please add new customer(s)"
           >
+            <template v-slot:item.index="{ index }">
+              {{ index + 1 }}
+            </template>
+
             <template v-slot:expanded-row="{ columns, item }">
               <tr>
                 <td :colspan="columns.length" class="pa-5">
@@ -304,7 +308,7 @@ const newCustomerContact = ref({
 });
 
 const headers = [
-  { title: "ID", key: "id" },
+  { title: "#", key: "index", align: "center" },
   { title: "Customer", key: "companyName" },
   { title: "Contact Person", key: "customerContactPersonName" },
   { title: "Manage", key: "actions", sortable: false },

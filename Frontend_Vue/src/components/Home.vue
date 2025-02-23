@@ -30,12 +30,28 @@
         </v-col>
       </v-row>
     </v-container>
+
+    <v-container class="mt-6">
+      <v-row>
+        <v-col cols="12" md="6">
+          <Calendar />
+        </v-col>
+        <v-col cols="12" md="6">
+          <PieChart />
+          <br />
+          <Timeline />
+        </v-col>
+      </v-row>
+    </v-container>
   </v-container>
 </template>
 
 <script setup>
 import { ref, onMounted, computed } from "vue";
 import { fetchStats } from "../endpoints/apiService.js";
+import Calendar from "../components/Calendar.vue";
+import PieChart from "./PieChart.vue";
+import Timeline from "./Timeline.vue";
 
 const stats = ref({
   employees: 0,
@@ -53,13 +69,6 @@ const formattedRevenue = computed(() => {
 });
 
 const statsList = computed(() => [
-  {
-    title: "Employees",
-    value: stats.value.employees,
-    icon: "mdi-account-group",
-    route: "/employees",
-  },
-  
   {
     title: "Services",
     value: stats.value.services,

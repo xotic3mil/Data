@@ -7,6 +7,7 @@
 // Styles
 import "@mdi/font/css/materialdesignicons.css";
 import DayJsAdapter from "@date-io/dayjs";
+import { VCalendar } from "vuetify/labs/VCalendar";
 import "vuetify/styles";
 
 // Composables
@@ -50,6 +51,9 @@ const dark = {
 };
 
 export default createVuetify({
+  components: {
+    VCalendar,
+  },
   date: {
     adapter: DayJsAdapter,
   },

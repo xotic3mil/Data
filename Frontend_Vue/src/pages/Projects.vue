@@ -65,6 +65,10 @@
               {{ item.employee.fullName }}
             </template>
 
+            <template v-slot:item.index="{ index }">
+              {{ index + 1 }}
+            </template>
+
             <template v-slot:expanded-row="{ columns, item }">
               <tr>
                 <td :colspan="columns.length" class="pa-10">
@@ -665,27 +669,64 @@
                 </v-dialog>
 
                 <!-- Delete confirmation dialog -->
-                <v-dialog v-model="dialogDelete" max-width="250px">
+                <v-dialog
+                  v-model="dialogDelete"
+                  transition="dialog-bottom-transition"
+                  max-width="500px"
+                >
                   <v-card>
-                    <v-card-title class="text-h5">Delete Item?</v-card-title>
-                    <v-card-text>
-                      Are you sure you want to delete this project?
+                    <v-toolbar
+                      color="red-darken-1"
+                      dark
+                      title="Delete Project"
+                    ></v-toolbar>
+
+                    <v-card-text class="pa-4 text-center">
+                      <v-icon size="64" color="red-darken-1" class="mb-4">
+                        mdi-alert-circle-outline
+                      </v-icon>
+                      <div class="text-h6">
+                        Are you sure you want to delete
+                        {{ editedItem.name }} project?
+                      </div>
+                      <v-divider class="my-4"></v-divider>
+                      <div class="text-body-2 mb-4">
+                        To confirm, type
+                        <span class="font-weight-bold">{{
+                          editedItem.name
+                        }}</span>
+                        in the box below
+                      </div>
+                      <v-text-field
+                        v-model="deleteConfirmation"
+                        variant="solo-filled"
+                        density="compact"
+                        class="mb-2"
+                        placeholder="Once you delete a project, there is no going back."
+                        :error="!!deleteConfirmationError"
+                        :error-messages="deleteConfirmationError"
+                      ></v-text-field>
+                      <div class="text-body-2 mt-5 font-weight-bold red-text">
+                        This action cannot be undone.
+                      </div>
                     </v-card-text>
-                    <v-card-actions>
-                      <v-spacer></v-spacer>
+
+                    <v-card-actions class="justify-end pa-4">
                       <v-btn
-                        color="red-darken-1"
+                        color="grey-darken-1"
                         variant="text"
                         @click="closeDelete"
-                        >Cancel</v-btn
                       >
+                        Cancel
+                      </v-btn>
                       <v-btn
-                        color="blue-lighten-1"
-                        variant="text"
+                        color="red-darken-4"
+                        variant="elevated"
                         @click="deleteItemConfirm"
-                        >OK</v-btn
+                        :disabled="deleteConfirmation !== editedItem.name"
                       >
-                      <v-spacer></v-spacer>
+                        Delete
+                      </v-btn>
                     </v-card-actions>
                   </v-card>
                 </v-dialog>
@@ -766,6 +807,8 @@ const employee = ref([]);
 const projects = ref([]);
 const editedIndex = ref(-1);
 const delay = ref(5000);
+const deleteConfirmation = ref("");
+const deleteConfirmationError = ref("");
 
 const priority = ref([
   { id: 1, name: "Low" },
@@ -790,7 +833,7 @@ const filteredProductEmployees = computed(() => {
 });
 
 const headers = [
-  { title: "ID", key: "id" },
+  { title: "#", key: "index", align: "center" },
   { title: "Status", key: "status" },
   { title: "Name", key: "name" },
   { title: "Description", key: "description" },
@@ -924,6 +967,11 @@ function deleteItem(item) {
 
 async function deleteItemConfirm() {
   try {
+    if (deleteConfirmation.value !== editedItem.value.name) {
+      deleteConfirmationError.value = "Project name does not match";
+      return;
+    }
+
     await deleteProject(editedItem.value.id);
 
     snackbar.value = {
@@ -954,6 +1002,8 @@ function closeDelete() {
   dialogDelete.value = false;
   editedItem.value = Object.assign({}, defaultItem);
   editedIndex.value = -1;
+  deleteConfirmation.value = "";
+  deleteConfirmationError.value = "";
 }
 
 const snackbar = ref({

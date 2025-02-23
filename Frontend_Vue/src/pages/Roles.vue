@@ -17,7 +17,7 @@ const editedIndex = ref(-1);
 const delay = ref(5000);
 
 const headers = [
-  { title: "ID", key: "id" },
+  { title: "#", key: "index", align: "center" },
   { title: "Role Name", key: "roleName" },
   { title: "Manage", key: "actions", sortable: false },
 ];
@@ -178,6 +178,10 @@ onMounted(async () => {
             item-value="id"
             no-data-text="Please add new role(s)"
           >
+            <template v-slot:item.index="{ index }">
+              {{ index + 1 }}
+            </template>
+
             <template v-slot:top>
               <v-toolbar flat>
                 <v-toolbar-title>Roles</v-toolbar-title>

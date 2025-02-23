@@ -86,7 +86,6 @@ export function mapProjectData(projects, status, customer, employee, service) {
   });
 }
 
-
 export async function fetchProjects(
   searchTerm,
   status,
@@ -176,3 +175,164 @@ export async function deleteProject(id) {
     throw error;
   }
 }
+
+const mapCalendarProjectData = (projects) => {
+  if (!Array.isArray(projects)) {
+    console.error("Invalid projects data received:", projects);
+    return [];
+  }
+
+  return projects
+    .filter(
+      (project) =>
+        project && (project.startDate || project.endDate) && project.name
+    )
+    .flatMap((project) => {
+      const events = [];
+
+      // Add Start Date event
+      if (project.startDate) {
+        events.push({
+          name: "Project Start Date",
+          projectName: project.name,
+          start: new Date(project.startDate),
+          end: new Date(project.startDate),
+          color: "green", // Different color for start dates
+          timed: false,
+          details: {
+            id: project.id,
+            priority: project.priority || "N/A",
+            customer: project.customers?.companyName || "N/A",
+            status: project.status || "N/A",
+            startDate: project.startDate,
+            endDate: project.endDate,
+            type: "start",
+          },
+        });
+      }
+
+      // Add End Date event
+      if (project.endDate) {
+        events.push({
+          name: "Project End Date",
+          projectName: project.name,
+          start: new Date(project.endDate),
+          end: new Date(project.endDate),
+          color: getProjectPriorityColor(project.priority),
+          timed: false,
+          details: {
+            id: project.id,
+            priority: project.priority || "N/A",
+            customer: project.customers?.companyName || "N/A",
+            status: project.status || "N/A",
+            startDate: project.startDate,
+            endDate: project.endDate,
+            type: "end",
+          },
+        });
+      }
+
+      return events;
+    });
+};
+
+// Helper function for priority colors
+const getProjectPriorityColor = (priority) => {
+  const priorityColors = {
+    Low: "blue",
+    Medium: "orange",
+    High: "red",
+    Critical: "deep-purple-darken-2",
+  };
+  return priorityColors[priority] || "blue";
+};
+
+// Calendar-specific fetch function
+export const fetchCalendarProjects = async () => {
+  try {
+    const response = await fetch("http://192.168.1.6:5000/api/projects");
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    const data = await response.json();
+
+    if (!Array.isArray(data)) {
+      console.error("Invalid data format received:", data);
+      return [];
+    }
+
+    return mapCalendarProjectData(data);
+  } catch (error) {
+    console.error("Error fetching calendar projects:", {
+      message: error.message,
+      status: error.status,
+      url: "http://192.168.1.6:5000/api/projects",
+    });
+    return [];
+  }
+};
+
+export const fetchProjectStatusData = async () => {
+  try {
+    const response = await fetch("http://192.168.1.6:5000/api/projects");
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    const data = await response.json();
+    console.log("Raw project data:", data);
+
+    if (!Array.isArray(data)) {
+      console.error("Invalid data format received:", data);
+      return [];
+    }
+
+    // Count projects by status using the nested status object
+    const statusCount = data.reduce((acc, project) => {
+      const statusName = project.status?.status || "Unknown";
+      acc[statusName] = (acc[statusName] || 0) + 1;
+      return acc;
+    }, {});
+
+    console.log("Status count:", statusCount);
+
+    // Convert to chart data format
+    return Object.entries(statusCount).map(([status, count]) => ({
+      name: status,
+      value: count,
+    }));
+  } catch (error) {
+    console.error("Error fetching project status data:", error);
+    return [];
+  }
+};
+
+export const fetchTimelineProjects = async () => {
+  try {
+    const response = await fetch("http://192.168.1.6:5000/api/projects");
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    const data = await response.json();
+    if (!Array.isArray(data)) {
+      console.error("Invalid data format received:", data);
+      return [];
+    }
+
+    return data.map((project) => ({
+      id: project.id,
+      name: project.name,
+      startDate: project.startDate,
+      endDate: project.endDate,
+      priority: project.priority,
+      status: project.status,
+      customers: project.customers,
+    }));
+  } catch (error) {
+    console.error("Error fetching timeline projects:", error);
+    return [];
+  }
+};
