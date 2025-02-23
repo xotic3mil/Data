@@ -23,7 +23,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from "vue";
+import { ref, onMounted, computed } from "vue";
 import ECharts from "vue-echarts";
 import { use } from "echarts/core";
 import { PieChart } from "echarts/charts";
@@ -34,6 +34,15 @@ import {
 } from "echarts/components";
 import { CanvasRenderer } from "echarts/renderers";
 import { fetchProjectStatusData } from "@/endpoints/projectEndpoint";
+import { useTheme } from "vuetify";
+// ...existing imports...
+
+const theme = useTheme();
+
+// Add computed property for text color
+const textColor = computed(() =>
+  theme.current.value.dark ? "#ffffff" : "#000000"
+);
 
 use([
   PieChart,
@@ -57,7 +66,7 @@ const chartOption = ref({
     type: "scroll",
     textStyle: {
       fontSize: 12,
-      color: "#ffffff",
+      color: computed(() => textColor.value),
     },
   },
   series: [
@@ -68,7 +77,7 @@ const chartOption = ref({
       avoidLabelOverlap: true,
       itemStyle: {
         borderRadius: 10,
-        borderColor: "#ffffff",
+        borderColor: computed(() => textColor.value),
         borderWidth: 2,
       },
       label: {
@@ -77,8 +86,7 @@ const chartOption = ref({
         position: "outer",
         alignTo: "none",
         bleedMargin: 5,
-        fontSize: 18,
-        color: "#ffffff", // Make label text white
+        color: computed(() => textColor.value),
         textBorderColor: "rgba(0, 0, 0, 0.3)", // Add text border for better visibility
         textBorderWidth: 1,
         textShadowBlur: 0,
@@ -89,6 +97,7 @@ const chartOption = ref({
           show: true,
           fontSize: 14,
           fontWeight: "bold",
+          color: computed(() => textColor.value),
         },
         itemStyle: {
           shadowBlur: 10,
@@ -119,6 +128,7 @@ const getProjectStatusData = async () => {
   loading.value = true;
   try {
     const statusData = await fetchProjectStatusData();
+
     console.log("Received status data:", statusData); // Debug log
 
     const chartData = statusData.map((item) => ({

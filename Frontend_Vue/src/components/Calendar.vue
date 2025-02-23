@@ -1,7 +1,7 @@
 <template>
   <v-row class="fill-height">
     <v-col>
-      <v-card flat class="elevation-5 rounded-lg">
+      <v-card flat class="calendar-card">
         <v-card-title class="d-flex align-center justify-space-between">
           <div class="d-flex align-center">
             <v-icon start color="primary" class="mr-2">mdi-calendar</v-icon>
@@ -141,25 +141,44 @@ onMounted(async () => {
 </script>
 
 <style scoped>
-.v-event {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  border-radius: 4px;
-  padding: 2px 4px;
-  font-size: 12px;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.2s ease;
+.calendar-card {
+  border-radius: 16px;
+  background: #212121;
+  border: 3px solid rgba(var(--v-border-color), 0.05);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-.v-event:hover {
-  opacity: 0.9;
-  transform: translateY(-1px);
+/* Calendar custom styling */
+:deep(.v-calendar) {
+  background: transparent !important;
+  border-radius: 12px;
+  padding: 16px;
+}
+
+:deep(.v-calendar-weekly__head-weekday) {
+  font-size: 0.875rem;
+  color: var(--v-theme-on-surface-variant);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+:deep(.v-calendar-weekly__day) {
+  border-radius: 8px;
+  transition: background-color 0.2s ease;
+}
+
+:deep(.v-calendar-weekly__day:hover) {
+  background-color: rgba(var(--v-theme-primary), 0.05) !important;
+}
+
+:deep(.v-event) {
+  border-radius: 8px;
+  border: none !important;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 :deep(.v-calendar-weekly__day--current) {
-  background-color: rgb(var(--v-theme-primary), 0.1) !important;
+  background-color: rgba(var(--v-theme-primary), 0.1) !important;
   border: 1px solid rgb(var(--v-theme-primary)) !important;
 }
 
@@ -172,5 +191,35 @@ onMounted(async () => {
   display: flex;
   align-items: center;
   justify-content: center;
+}
+
+/* Event styles */
+.v-event {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  border-radius: 8px;
+  padding: 4px 8px;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.v-event:hover {
+  opacity: 0.9;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+/* Responsive adjustments */
+@media (max-width: 600px) {
+  :deep(.v-calendar-weekly__head-weekday) {
+    font-size: 0.75rem;
+  }
+
+  :deep(.v-calendar-weekly__day-label) {
+    font-size: 0.875rem;
+  }
 }
 </style>

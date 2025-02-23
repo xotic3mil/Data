@@ -163,3 +163,52 @@ export async function deleteService(id) {
     throw error;
   }
 }
+
+export async function fetchServiceDistribution() {
+  try {
+    // First fetch services
+    const servicesResponse = await fetch(`${API_URL}`);
+    if (!servicesResponse.ok) {
+      throw new Error(`HTTP error! status: ${servicesResponse.status}`);
+    }
+    const services = await servicesResponse.json();
+
+    // Log services to debug
+    console.log("Fetched services:", services);
+
+    // Then fetch projects
+    const projectsResponse = await fetch(
+      "http://192.168.1.6:5000/api/projects"
+    );
+    if (!projectsResponse.ok) {
+      throw new Error(`HTTP error! status: ${projectsResponse.status}`);
+    }
+    const projects = await projectsResponse.json();
+
+    // Count service usage for all services, including those with zero usage
+    const serviceUsage = services.map((service) => {
+      // Debug log for each service
+      console.log("Processing service:", service);
+
+      const customerCount = projects.filter(
+        (project) => project.serviceId === service.id
+      ).length;
+
+      return {
+        serviceName: service.serviceName || "No Name", // Try serviceName first, fallback to 'No Name'
+        customerCount: customerCount || 0,
+      };
+    });
+
+    // Sort by customer count in descending order
+    const sortedServiceUsage = serviceUsage.sort(
+      (a, b) => b.customerCount - a.customerCount
+    );
+
+    console.log("Service usage data:", sortedServiceUsage);
+    return sortedServiceUsage;
+  } catch (error) {
+    console.error("Error fetching service distribution:", error);
+    return [];
+  }
+}
