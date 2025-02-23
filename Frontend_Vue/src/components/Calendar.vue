@@ -1,7 +1,7 @@
 <template>
   <v-row class="fill-height">
     <v-col>
-      <v-card flat class="calendar-card">
+      <v-card flat class="elevation-5 calendar-card">
         <v-card-title class="d-flex align-center justify-space-between">
           <div class="d-flex align-center">
             <v-icon start color="primary" class="mr-2">mdi-calendar</v-icon>
@@ -143,8 +143,8 @@ onMounted(async () => {
 <style scoped>
 .calendar-card {
   border-radius: 16px;
-  background: #212121;
-  border: 3px solid rgba(var(--v-border-color), 0.05);
+  background: rgb(var(--v-theme-surface));
+  border: 1px solid rgba(var(--v-border-color), 0.05);
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
@@ -157,7 +157,7 @@ onMounted(async () => {
 
 :deep(.v-calendar-weekly__head-weekday) {
   font-size: 0.875rem;
-  color: var(--v-theme-on-surface-variant);
+  color: rgb(var(--v-theme-on-surface-variant));
   text-transform: uppercase;
   letter-spacing: 0.5px;
 }
@@ -165,6 +165,7 @@ onMounted(async () => {
 :deep(.v-calendar-weekly__day) {
   border-radius: 8px;
   transition: background-color 0.2s ease;
+  color: rgb(var(--v-theme-on-surface));
 }
 
 :deep(.v-calendar-weekly__day:hover) {
@@ -175,6 +176,7 @@ onMounted(async () => {
   border-radius: 8px;
   border: none !important;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  color: rgb(var(--v-theme-on-surface));
 }
 
 :deep(.v-calendar-weekly__day--current) {
@@ -184,7 +186,7 @@ onMounted(async () => {
 
 :deep(.v-calendar-weekly__day--current .v-calendar-weekly__day-label) {
   background-color: rgb(var(--v-theme-primary));
-  color: white;
+  color: rgb(var(--v-theme-on-primary));
   border-radius: 50%;
   width: 32px;
   height: 32px;
@@ -210,6 +212,27 @@ onMounted(async () => {
   opacity: 0.9;
   transform: translateY(-1px);
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+/* Theme-specific adjustments */
+:deep(.v-theme--light) {
+  .calendar-card {
+    background: rgb(var(--v-theme-surface));
+  }
+
+  .v-calendar-weekly__day {
+    border-color: rgba(0, 0, 0, 0.12) !important;
+  }
+}
+
+:deep(.v-theme--dark) {
+  .calendar-card {
+    background: rgb(var(--v-theme-surface));
+  }
+
+  .v-calendar-weekly__day {
+    border-color: rgba(255, 255, 255, 0.12) !important;
+  }
 }
 
 /* Responsive adjustments */

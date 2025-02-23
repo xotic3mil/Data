@@ -7,7 +7,7 @@
   </v-app-bar>
 
   <v-navigation-drawer v-model="drawer" :width="250" floating permanent>
-    <v-list nav class="layout">
+    <v-list nav class="layout" style="font-size: 1.25rem">
       <v-list-item
         class="mt-3"
         prepend-icon="mdi-view-dashboard"

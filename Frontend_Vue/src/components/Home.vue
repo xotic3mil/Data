@@ -13,7 +13,7 @@
             v-motion-pop-visible
             class="stat-card"
             :to="stat.route"
-            elevation="0"
+            elevation="5"
           >
             <div class="stat-card__content">
               <v-icon
@@ -110,9 +110,9 @@ onMounted(async () => {
 <style scoped>
 .stat-card {
   border-radius: 16px;
-  background: #212121;
+  background: rgb(var(--v-theme-surface));
   backdrop-filter: blur(10px);
-  border: 3px solid rgba(var(--v-border-color), 0.05);
+  border: 1px solid rgba(var(--v-border-color), 0.05);
 }
 
 .stat-card__content {
@@ -133,12 +133,12 @@ onMounted(async () => {
 .stat-card__value {
   font-size: 1.5rem;
   font-weight: 600;
-  color: var(--v-theme-on-surface);
+  color: rgb(var(--v-theme-on-surface));
 }
 
 .stat-card__title {
   font-size: 0.875rem;
-  color: var(--v-theme-on-surface-variant);
+  color: rgb(var(--v-theme-on-surface-variant));
   text-transform: uppercase;
   letter-spacing: 0.5px;
 }
@@ -150,11 +150,21 @@ onMounted(async () => {
 
 .stat-card:hover {
   transform: translateY(-8px);
-  box-shadow: 0 14px 28px rgba(0, 0, 0, 0.15), 0 10px 10px rgba(0, 0, 0, 0.12);
+  background: rgb(var(--v-theme-surface-variant));
+  box-shadow: 0 14px 28px rgba(0, 0, 0, 0.1), 0 10px 10px rgba(0, 0, 0, 0.08);
 }
 
 .stat-card:hover .stat-card__icon {
   transform: scale(1.1);
+}
+
+:deep(.v-theme--dark) .stat-card {
+  background: #212121;
+}
+
+:deep(.v-theme--dark) .stat-card:hover {
+  background: #2d2d2d;
+  box-shadow: 0 14px 28px rgba(0, 0, 0, 0.25), 0 10px 10px rgba(0, 0, 0, 0.22);
 }
 
 /* Responsive adjustments */

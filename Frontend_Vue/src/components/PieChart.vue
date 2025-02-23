@@ -65,7 +65,7 @@ const chartOption = ref({
     itemGap: 10,
     type: "scroll",
     textStyle: {
-      fontSize: 12,
+      fontSize: 14,
       color: computed(() => textColor.value),
     },
   },
@@ -89,7 +89,8 @@ const chartOption = ref({
         color: computed(() => textColor.value),
         textBorderColor: "rgba(0, 0, 0, 0.3)", // Add text border for better visibility
         textBorderWidth: 1,
-        textShadowBlur: 0,
+        textShadowBlur: 1,
+        fontSize: 16,
         textShadowColor: "rgba(0, 0, 0, 0.5)",
       },
       emphasis: {
