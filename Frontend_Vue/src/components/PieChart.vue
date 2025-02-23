@@ -128,9 +128,6 @@ const getProjectStatusData = async () => {
   loading.value = true;
   try {
     const statusData = await fetchProjectStatusData();
-
-    console.log("Received status data:", statusData); // Debug log
-
     const chartData = statusData.map((item) => ({
       name: item.name,
       value: parseInt(item.value), // Ensure value is a number
@@ -139,7 +136,6 @@ const getProjectStatusData = async () => {
       },
     }));
 
-    console.log("Chart data:", chartData); // Debug log
     chartOption.value.series[0].data = chartData;
   } catch (error) {
     console.error("Error fetching project status data:", error);

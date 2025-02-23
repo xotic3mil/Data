@@ -6,7 +6,6 @@ export function updateProjectPayload(
   service
 ) {
   // Add debug logging
-  console.log("Input projectData:", projectData);
 
   // Find all required objects with their complete structure
   const statusObj = status.find((s) => s.id === Number(projectData.statusId));
@@ -282,7 +281,6 @@ export const fetchProjectStatusData = async () => {
     }
 
     const data = await response.json();
-    console.log("Raw project data:", data);
 
     if (!Array.isArray(data)) {
       console.error("Invalid data format received:", data);
@@ -295,8 +293,6 @@ export const fetchProjectStatusData = async () => {
       acc[statusName] = (acc[statusName] || 0) + 1;
       return acc;
     }, {});
-
-    console.log("Status count:", statusCount);
 
     // Convert to chart data format
     return Object.entries(statusCount).map(([status, count]) => ({

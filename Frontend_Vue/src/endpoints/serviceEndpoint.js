@@ -173,9 +173,6 @@ export async function fetchServiceDistribution() {
     }
     const services = await servicesResponse.json();
 
-    // Log services to debug
-    console.log("Fetched services:", services);
-
     // Then fetch projects
     const projectsResponse = await fetch(
       "http://192.168.1.6:5000/api/projects"
@@ -188,7 +185,6 @@ export async function fetchServiceDistribution() {
     // Count service usage for all services, including those with zero usage
     const serviceUsage = services.map((service) => {
       // Debug log for each service
-      console.log("Processing service:", service);
 
       const customerCount = projects.filter(
         (project) => project.serviceId === service.id
@@ -205,7 +201,6 @@ export async function fetchServiceDistribution() {
       (a, b) => b.customerCount - a.customerCount
     );
 
-    console.log("Service usage data:", sortedServiceUsage);
     return sortedServiceUsage;
   } catch (error) {
     console.error("Error fetching service distribution:", error);
