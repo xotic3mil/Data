@@ -10,8 +10,11 @@
     "lint": "eslint . --fix"
   },
   "dependencies": {
+    "@date-io/dayjs": "^3.2.0",
     "@mdi/font": "7.4.47",
     "@vueuse/motion": "^2.2.6",
+    "date-fns": "^4.1.0",
+    "dayjs": "^1.11.13",
     "dompurify": "^3.2.4",
     "markdown-it": "^14.1.0",
     "roboto-fontface": "*",

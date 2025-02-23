@@ -95,11 +95,13 @@
                             ></v-text-field>
                           </v-col>
                           <v-col cols="12" sm="12">
-                            <v-text-field
+                            <v-date-picker
+                              width="430"
                               type="date"
+                              title="Contract Start Date"
                               v-model="editedItem.contractStartDate"
                               label="Contract Start Date *"
-                            ></v-text-field>
+                            ></v-date-picker>
                           </v-col>
                           <v-col cols="12" sm="12">
                             <v-select
@@ -188,7 +190,7 @@
       <v-snackbar
         v-model="snackbar.show"
         :color="snackbar.color"
-        :timeout="2000"
+        :timeout="snackbar.timeout"
       >
         {{ snackbar.message }}
 
@@ -203,6 +205,7 @@
 <script setup>
 import { ref, computed, onMounted, watch } from "vue";
 import { fetchRoles } from "@/endpoints/rolesEndpoint.js";
+import { format, parseISO } from "date-fns";
 import {
   fetchEmployees as fetchEmployeesApi,
   createEmployee,
@@ -219,7 +222,6 @@ const roles = ref([]);
 const employees = ref([]);
 const editedIndex = ref(-1);
 const delay = ref(5000);
-const timeout = ref(null);
 
 const headers = [
   { title: "ID", key: "id" },
@@ -256,6 +258,7 @@ const snackbar = ref({
   show: false,
   message: "",
   color: "error",
+  timeout: 5000,
 });
 
 const formTitle = computed(() => {
@@ -279,24 +282,50 @@ async function fetchEmployees() {
         delay.value / 1000
       } seconds...`,
       color: "error",
+      timeout: 5000,
     };
     setTimeout(() => fetchEmployees(), delay.value);
     delay.value += 5000;
   }
 }
 
-async function save(item) {
+async function save() {
   try {
-    if (item.contractStartDate === "") {
-      item.contractStartDate = null;
+    let changes = [];
+    if (editedItem.value.contractStartDate) {
+      // Ensure contractStartDate is a string before parsing
+      if (typeof editedItem.value.contractStartDate === "string") {
+        editedItem.value.contractStartDate = format(
+          parseISO(editedItem.value.contractStartDate),
+          "yyyy-MM-dd"
+        );
+      } else {
+        // If it's already a Date object, format it directly
+        editedItem.value.contractStartDate = format(
+          editedItem.value.contractStartDate,
+          "yyyy-MM-dd"
+        );
+      }
     }
-
     if (editedIndex.value > -1) {
+      const originalItem = employees.value[editedIndex.value];
+      // Compare original and edited data to find changes
+      for (const key in editedItem.value) {
+        if (editedItem.value[key] !== originalItem[key]) {
+          changes.push(
+            `${key}: ${originalItem[key]} -> ${editedItem.value[key]}`
+          );
+        }
+      }
+
       await updateEmployee(editedItem.value);
       snackbar.value = {
         show: true,
-        message: "Employee updated successfully!",
+        message: `Employee updated successfully! Changes: ${changes.join(
+          ", "
+        )}`,
         color: "success",
+        timeout: 5000,
       };
     } else {
       await createEmployee(editedItem.value);
@@ -304,6 +333,7 @@ async function save(item) {
         show: true,
         message: "Employee created successfully!",
         color: "success",
+        timeout: 5000,
       };
     }
 
@@ -315,6 +345,7 @@ async function save(item) {
       show: true,
       message: error.message,
       color: "error",
+      timeout: 5000,
     };
   }
 }
@@ -326,6 +357,7 @@ async function deleteItemConfirm() {
       show: true,
       message: "Employee was deleted successfully!",
       color: "success",
+      timeout: 5000,
     };
     await fetchEmployees();
     closeDelete();
@@ -335,6 +367,7 @@ async function deleteItemConfirm() {
       show: true,
       message: error.message,
       color: "error",
+      timeout: 5000,
     };
   }
 }
@@ -354,6 +387,13 @@ async function loadRoles() {
 function editItem(item) {
   editedIndex.value = employees.value.indexOf(item);
   editedItem.value = Object.assign({}, item);
+  // Ensure the date is in the correct format
+  if (editedItem.value.contractStartDate) {
+    editedItem.value.contractStartDate = format(
+      parseISO(editedItem.value.contractStartDate),
+      "yyyy-MM-dd"
+    );
+  }
   dialog.value = true;
 }
 

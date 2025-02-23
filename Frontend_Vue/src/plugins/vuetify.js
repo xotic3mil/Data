@@ -6,6 +6,7 @@
 
 // Styles
 import "@mdi/font/css/materialdesignicons.css";
+import DayJsAdapter from "@date-io/dayjs";
 import "vuetify/styles";
 
 // Composables
@@ -49,6 +50,9 @@ const dark = {
 };
 
 export default createVuetify({
+  date: {
+    adapter: DayJsAdapter,
+  },
   theme: {
     defaultTheme: "light",
     themes: {

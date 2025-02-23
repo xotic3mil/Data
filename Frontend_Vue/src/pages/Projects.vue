@@ -235,7 +235,7 @@
                 ></v-text-field>
 
                 <!-- New/Edit dialog -->
-                <v-dialog v-model="dialog" max-width="1000px">
+                <v-dialog v-model="dialog" max-width="35%">
                   <template v-slot:activator="{ props }">
                     <div v-motion-slide-bottom>
                       <v-btn

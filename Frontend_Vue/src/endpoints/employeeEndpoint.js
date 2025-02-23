@@ -1,3 +1,5 @@
+import { format, parseISO } from "date-fns";
+
 const API_URL = "http://192.168.1.6:5000/api";
 
 export async function fetchEmployees(searchTerm = "") {
@@ -20,6 +22,13 @@ export async function fetchEmployees(searchTerm = "") {
 }
 
 export async function createEmployee(employeeData) {
+  if (employeeData.contractStartDate) {
+    employeeData.contractStartDate = format(
+      parseISO(employeeData.contractStartDate),
+      "yyyy-MM-dd"
+    );
+  }
+
   const response = await fetch(`${API_URL}/employees`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -35,6 +44,13 @@ export async function createEmployee(employeeData) {
 }
 
 export async function updateEmployee(employeeData) {
+  if (employeeData.contractStartDate) {
+    employeeData.contractStartDate = format(
+      parseISO(employeeData.contractStartDate),
+      "yyyy-MM-dd"
+    );
+  }
+
   const response = await fetch(`${API_URL}/employees`, {
     method: "PUT",
     headers: { "Content-Type": "application/json" },
