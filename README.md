@@ -3,11 +3,13 @@
 
 ### Contains
 * Backend: .NET
-* Frontend: VueJS
+* Frontend: VueJS with Vuetify Open Source UI Library.
 * CRUD functionality
 * WebAPI - Added search functionality on Employees & Projects
 * Statistics based on Status and Service Distribution
 * Calendar with upcomming projects and deadlines.
+* Transaction Management
+* xUnit tests with and without mock
 
 ![image](https://github.com/user-attachments/assets/ae25cf8c-bfa9-465c-be04-1a7cc8d20253)
 
@@ -214,6 +216,20 @@ public interface IBaseRepository<TEntity> where TEntity : class
 ```
 
 ## Business Layer
+
+The services in the Business layer are responsible for handling CRUD operations (Create, Read, Update, Delete) for various entities such as services, roles, customers, projects, and units. They ensure that business logic is applied consistently and provide a clear API for interacting with the underlying data repositories. The tests ensure that these services behave as expected under different scenarios.
+
+## Services
+
+Main methods for all services
+
+```
+•	Create: Creates a new object
+•	Delete: Deletes an existing object by its ID.
+•	GetId: Retrieves a object by its ID.
+•	GetSearch: Retrieves all object, optionally filtered by a search term.
+•	Update: Updates an existing object.
+```
 
 
 
