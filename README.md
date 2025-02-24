@@ -24,6 +24,7 @@
   - [Services](#services)
 - [WebAPI](#webapi)
 - [Tests](#tests)
+- [Transaction Management](#transaction-management)
 
 ## Data Layer
 Responsible for managing database interactions while keeping a clear separation of concerns. It ensures that business logic remains independent of the database implementation, improving maintainability and scalability.
@@ -337,4 +338,29 @@ Ran tests for the Business layer on all Factories ( Without Mock ) and Services 
 
 ![image](https://github.com/user-attachments/assets/f3d7ab3d-2333-4466-bead-52c9148490e9)
 
+## Transaction Management
+
+Added transaction management for all services in methods create, update and delete.
+
+Code Snippet:
+
+```
+            try 
+            {
+                await _currencyRepository.BeginTransactionAsync();
+                currencyEntity = await _currencyRepository.CreateAsync(currencyEntity);
+                await _currencyRepository.SaveChangesAsync();
+                await _currencyRepository.CommitTransactionAsync();
+            }
+            catch (Exception ex)
+            {
+                await _currencyRepository.RollbackTransactionAsync();
+                Debug.WriteLine(ex.Message);
+                return null!;
+            }
+            
+            return CurrencyFactory.Create(currencyEntity);
+
+        }
+```
 
