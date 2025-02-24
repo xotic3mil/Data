@@ -23,6 +23,7 @@
 - [Business Layer](#business-layer)
   - [Services](#services)
 - [WebAPI](#webapi)
+- [Tests](#tests)
 
 ## Data Layer
 Responsible for managing database interactions while keeping a clear separation of concerns. It ensures that business logic remains independent of the database implementation, improving maintainability and scalability.
@@ -324,3 +325,16 @@ UnitController.cs
         }
     }
 ```
+
+## Tests
+
+Ran tests for the Business layer on all Factories ( Without Mock ) and Services ( With Mock )
+
+* Service xUnit test:
+* Create when object exists & does not exists
+* Delete when object exists & does not exists
+* Update when object exists
+
+![image](https://github.com/user-attachments/assets/f3d7ab3d-2333-4466-bead-52c9148490e9)
+
+
