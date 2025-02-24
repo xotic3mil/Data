@@ -1,15 +1,35 @@
 # ProcrastiPlan
-## A project for learning to create a .NET application following SOLID principles with PostgreSQL, WebAPI and Frontend with VueJS
+## A minor Project Management Application
+
+### Contains
+* Backend: .NET
+* Frontend: VueJS
+* CRUD functionality
+* WebAPI - Added search functionality on Employees & Projects
+* Statistics based on Status and Service Distribution
+* Calendar with upcomming projects and deadlines.
 
 ![image](https://github.com/user-attachments/assets/ae25cf8c-bfa9-465c-be04-1a7cc8d20253)
+
 
 ## Table of Contents
 - [Data Layer](#data-layer)
   - [Contexts](#contexts)
+  - [Entities](#entities)
+  - [Repositories](#Repositories)
+  - [Interfaces](#Interfaces)
 - [Business Layer](#business-layer)
 
 ## Data Layer
-asdasdasdasd
+Responsible for managing database interactions while keeping a clear separation of concerns. It ensures that business logic remains independent of the database implementation, improving maintainability and scalability.
+| Feature         | Benefits      |
+| -------------   |:-------------:| 
+| Encapsulation   | Keeps database logic separate from business logic. |
+| Abstraction     | Business Layer works with interfaces, not concrete classes. | 
+| Maintainability | Easier to modify or swap database providers.     |
+| Testability     | Allows mocking repositories for unit tests.      |
+| Reusability     | Standardized data access for different entities. |
+
 
 ### Contexts
 AppDbContext
@@ -194,6 +214,7 @@ public interface IBaseRepository<TEntity> where TEntity : class
 ```
 
 ## Business Layer
+
 
 
 
