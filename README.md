@@ -21,6 +21,8 @@
   - [Repositories](#Repositories)
   - [Interfaces](#Interfaces)
 - [Business Layer](#business-layer)
+  - [Services](#services)
+-[WebAPI](#webapi)
 
 ## Data Layer
 Responsible for managing database interactions while keeping a clear separation of concerns. It ensures that business logic remains independent of the database implementation, improving maintainability and scalability.
@@ -230,6 +232,10 @@ Main methods for all services
 •	GetSearch: Retrieves all object, optionally filtered by a search term.
 •	Update: Updates an existing object.
 ```
+
+## WebAPI
+
+Unique controllers for all Endpoints handling [HttpGet] [HttpPost] [HttpPut] [HttpDelete]
 
 
 
