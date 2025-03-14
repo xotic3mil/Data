@@ -1,5 +1,6 @@
 # ProcrastiPlan
-## A minor Project Management Application
+## Introduction
+Project Management Webb Application written with C# and Javascript.
 
 ### Contains
 * Backend: .NET
@@ -15,6 +16,7 @@
 
 
 ## Table of Contents
+- [Introduction](#introduction)
 - [Data Layer](#data-layer)
   - [Contexts](#contexts)
   - [Entities](#entities)
